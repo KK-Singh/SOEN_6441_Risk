@@ -1,12 +1,22 @@
 package view;
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.VPos;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser;
+import java.io.File;
+
 /**
  * @author yashpandya
  *
@@ -56,8 +66,28 @@ public class CreateMap extends Application {
         GridPane.setConstraints(nextButton1, 1, 2);
         nextButton1.setOnAction( e -> getData(continentInput, continentInput.getText(), countryInput, countryInput.getText()) );
         
+        // horizontal line
+        final Separator sepHor = new Separator();
+        sepHor.setValignment(VPos.CENTER);
+        GridPane.setConstraints(sepHor, 0, 4);
+        GridPane.setColumnSpan(sepHor, 8);
+        
+      //uploadFile Label - constrains use (child, column, row)
+        Label uploadFileLabel = new Label("Upload existing Map:");
+        GridPane.setConstraints(uploadFileLabel, 1, 5);
+        
+        // upload file
+        FileChooser fileChooser = new FileChooser();
+
+        Button uploadButton = new Button("Select File");
+        GridPane.setConstraints(uploadButton, 1, 6);
+        uploadButton.setOnAction(e -> {
+            File selectedFile = fileChooser.showOpenDialog(primaryStage);
+            System.out.println(selectedFile.getName());
+        });
+        
         //Add everything to grid
-        grid.getChildren().addAll(continentLabel, continentInput, countryLabel, countryInput, nextButton1);
+        grid.getChildren().addAll(continentLabel, continentInput, countryLabel, countryInput, nextButton1, sepHor, uploadFileLabel, uploadButton);
 
         Scene scene = new Scene(grid, 300, 200);
         window.setScene(scene);
