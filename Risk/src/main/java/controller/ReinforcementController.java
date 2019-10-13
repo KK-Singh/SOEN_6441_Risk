@@ -16,12 +16,13 @@ public class ReinforcementController {
 	 * @param country: country object
 	 * @return String message
 	 */
-		public String increaseArmies(Country country) {
-			Player player = country.getOwner_player();
+		public String increaseArmies(Country country, Player player) {
+			player = country.getOwner_player();
 			if (player.getArmy_left() == 0) {
 				return "NO ARMIES LEFT IN THIS COUNTRY! PLEASE CHOOSE FINISH REINFORCEMENT";
 			} else {
-				updateNewValues(player, country);
+				country.setNo_of_armies(country.getNo_of_armies() + 1);
+				player.setArmy_left(player.getArmy_left() - 1);
 				return "";
 			}
 		}
@@ -47,15 +48,18 @@ public class ReinforcementController {
 		 */
 
 		public void NumberOfReinforcementArmies(Player player) {
+			int armies = 0;
+			List<Continent> continents = checkContinentConquered(player);
 			int allPlayersCountries = player.getAlloccupied_countries().size();
 			float allArmiesForReinforcement = (float) allPlayersCountries / 3;
-			int armies = 0;
 			if (allArmiesForReinforcement < 3.0) {
 				armies = armies + 3;
 			} else {
 				armies = armies + (int) allArmiesForReinforcement;
 			}
-			armies = armies + numberOfArmiesByValueOfContinent(player);
+			for (int i = 0; i < continents.size(); i++) {
+				armies = armies + continents.get(i).getControlValue();
+			}
 			player.setArmy_left(armies);
 		}
 		/**
@@ -69,42 +73,15 @@ public class ReinforcementController {
 			List<Continent> continents = new ArrayList<Continent>();
 			for (Map.Entry<String, Continent> entry : ReadingFiles.ContinentNameObject.entrySet()) {
 				List<Country> tempCountry = entry.getValue().getCountries();
-				int counter = 0;
-				for (int i = 0; i < entry.getValue().getCountries().size(); i++) {
-					if (entry.getValue().getCountries().get(i).getOwner_player().equals(player))
-						counter++;
-				}
-				if (tempCountry.size() == counter)
+				List<Country> playerCountries = getPlayersCountries(player);
+				Collections.sort(tempCountry);
+				Collections.sort(playerCountries);
+				if(tempCountry.equals(playerCountries)) {
 					continents.add(entry.getValue());
-			}
+				}
+				}
 			return continents;
 		}
-		/**
-		 * this method compute the number of armies according to the continent value
-		 * 
-		 * @param player: player object 
-		 * @return number of armies
-		 */
-		public int numberOfArmiesByValueOfContinent(Player player) {
-			List<Continent> continents = checkContinentConquered(player);
-			int armies = 0;
-			for (int i = 0; i < continents.size(); i++) {
-				armies = armies + continents.get(i).getControlValue();
-			}
-			return armies;
-		}
-		
-		/**
-		 * this method updates the number of armies player owns and number armies which is left in country
-		 * 
-		 * @param player: player object 
-		 * @param country: country object
-		 */
-		public void updateNewValues(Player player, Country country) {
-			country.setNo_of_armies(country.getNo_of_armies() + 1);
-			player.setArmy_left(player.getArmy_left() - 1);
-		}
-		
 		/**
 		 * this method checks player has moved all his armies into position or not
 		 * 
