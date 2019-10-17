@@ -2,39 +2,36 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import model.Continent;
 import model.Country;
 
 /**
- * @author Pegah
- * Verification of map 
+ * @author World
+ *
  */
 public class MapVerification {
-	HashMap<String,Country> map1;
-	HashMap<String,Continent>map2;
+	Map<Integer,Country> map1;
+	Map<Integer,Continent>map2;
 	public static boolean error = false;
 	
 	
 	
-	// constructor
 	
-	public MapVerification(HashMap<String, Country> map1, HashMap<String, Continent> map2) {
+	
+	public MapVerification(Map<Integer, Country> countryMap, Map<Integer, Continent> continentMap) {
 		super();
-		this.map1 = map1;
-		this.map2 = map2;
+		this.map1 = countryMap;
+		this.map2 = continentMap;
 	}
 
 
 
-
-	ArrayList<String> correctionlist = new ArrayList<>();	
-	ArrayList<String> ErrorList = new ArrayList<>();
-
-	/**
-	 * Checking map
-	 */
+	public ArrayList<String> correctionlist = new ArrayList<>();	
+	public ArrayList<String> ErrorList = new ArrayList<>();
+	
 
 	public void TwoWayCheck() {
 		for (int i=0;i<map1.size();i++) {
@@ -51,16 +48,6 @@ public class MapVerification {
 		
 	}
 	
-	
-
-	/**
-	 * Checking connectivity between countries.
-	 * @param country name of country
-	 *  @param queue que of the countries
-	
-	 */
-	
-	
 	public void graphConectivityCheck(Country country, Set<Country> queue, Continent continent) {
 		for(int i=0;i<country.getNeighbors().size();i++) {
 			Country neighborCountries = country.getNeighbors().get(i);
@@ -76,15 +63,7 @@ public class MapVerification {
 			}
 		}
 	}
-	 
-	
-
-	/**
-	 * 	checking if there is no neighbor and if country has itself as neighbor
-	
-	 */
-	
-	
+//	checking if there is no neighbor and if country has itself as neighbor
 	public void Neighborcheck() {
 		int n = map1.size();
 		for (int i =0;i<n;i++) {
@@ -99,13 +78,6 @@ public class MapVerification {
 		}
 		
 	}
-	
-
-	/**
-	 * 	checking country In MultiContinent
-	
-	 */
-	
 	
 	public void CountryInMultiContinentCheck() {
 		int n = map2.size();
@@ -123,21 +95,12 @@ public class MapVerification {
 		}
 	}
 	
-
-	
-	
-	
 	public void NoContinentOrCountry() {
 		if (map1.size() < 1 || map2.size() < 1) {
 			ErrorList.add("NO COUNTRY OR CONTINENT");
 		}
 
 	}
-	
-	/**
-	 * 	checking unused continent
-	
-	 */
 	
 	public void ContinentUnusedCheck() {
 		
@@ -162,17 +125,19 @@ public class MapVerification {
 	}
 	
 //method to call all check methods from UI
-	public void validateMethod() {
+	public boolean validateMethod() {
 //		TwoWayCheck();
 		Neighborcheck();
 		ContinentUnusedCheck();
 		CountryInMultiContinentCheck();
 		NoContinentOrCountry();
-		
 		if(ErrorList.size()>0) {
 			System.out.println(ErrorList);
+			return false;
 //		UI part:	
 		}
+		else
+			return true;
 	}
 
 }

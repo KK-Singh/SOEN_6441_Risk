@@ -17,11 +17,23 @@ import view.StartGame;
 import controller.MapVerification;
 
 public class MapService {
-	
-	
-	public static Map<Integer, Continent> continentMap = new HashMap<Integer, Continent>();
-	public static Map<Integer, Country> countryMap = new HashMap<Integer, Country>();
-	
+
+	public Map<Integer, Continent> continentMap = new HashMap<Integer, Continent>();
+	public Map<Integer, Country> countryMap = new HashMap<Integer, Country>();
+	private static MapService obj;
+
+	private MapService() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public static MapService getObject() {
+		if (obj == null) {
+			obj = new MapService();
+
+		}
+		return obj;
+	}
+
 	public void readFile(String filePath) throws IOException {
 
 		File file = new File(filePath);
@@ -93,9 +105,9 @@ public class MapService {
 
 		countryMap.forEach((k, v) -> {
 			pw.print(v.getName() + "," + v.getContinent().getName() + ",");
-			for(int i=0; i<v.getNeighbors().size(); i++) {
+			for (int i = 0; i < v.getNeighbors().size(); i++) {
 				pw.print(v.getNeighbors().get(i).getName());
-				if (i<v.getNeighbors().size()-1)
+				if (i < v.getNeighbors().size() - 1)
 					pw.print(",");
 			}
 			pw.println();
@@ -222,8 +234,8 @@ public class MapService {
 		});
 	}
 
-	private Country getCountry(String name) {
-		
+	public Country getCountry(String name) {
+
 		Iterator<Integer> ite = countryMap.keySet().iterator();
 
 		while (ite.hasNext()) {
@@ -236,7 +248,7 @@ public class MapService {
 
 	}
 
-	private Continent getContinent(String name) {
+	public Continent getContinent(String name) {
 		Iterator<Integer> ite = continentMap.keySet().iterator();
 
 		while (ite.hasNext()) {
@@ -247,7 +259,7 @@ public class MapService {
 		}
 		return null;
 	}
-	
+
 	public boolean mapValidate() {
 		MapVerification mapVerification = new MapVerification(countryMap, continentMap);
 		if (!mapVerification.validateMethod()) {
@@ -256,7 +268,7 @@ public class MapService {
 		}
 		return true;
 	}
-	
+
 	public static void main(String[] args) {
 
 		MapService service = new MapService();
@@ -293,13 +305,13 @@ public class MapService {
 		service.addNeighbour("Philippines", "NewCountry2");
 
 		System.out.println("BEFORE------------------------------------");
-		continentMap.forEach((k, v) -> {
-			System.out.println("Continent is " + v);
-			v.getCountries().forEach(cont -> {
-				System.out.println("Countries in the continent are " + cont);
-				cont.getNeighbors().forEach(temp -> System.out.println("Neighbouring Countries " + temp));
-			});
-		});
+//		continentMap.forEach((k, v) -> {
+//			System.out.println("Continent is " + v);
+//			v.getCountries().forEach(cont -> {
+//				System.out.println("Countries in the continent are " + cont);
+//				cont.getNeighbors().forEach(temp -> System.out.println("Neighbouring Countries " + temp));
+//			});
+//		});
 
 		// service.removeContinent("NewContinent");
 		// service.removeCountry("NewCountry");

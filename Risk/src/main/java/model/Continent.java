@@ -28,7 +28,7 @@ public class Continent {
 	/**
 	 * Continents control value.
 	 */
-	private int army_value;
+	private int control_value;
 	
 	/**
 	 * Creates a continent with a given name and Army Value.
@@ -41,27 +41,16 @@ public class Continent {
 	 */
 	
 	public Continent(int army_value, String name) {
-		this.continent_id=continent_id;
 		this.name=name;
-		this.army_value =army_value;
+		this.control_value =army_value;
 		this.countries= new ArrayList<>();
 		
 	}
 	
 	
 //	get and set methods
+	
 
-	
-	//Set Country ID
-	public void setContinent_ID(int Continent_ID ) {
-		this.continent_id=Continent_ID;
-	}
-	//get Country ID	
-	public int getContinent_ID() {
-		return continent_id;
-	}
-		
-	
 	public void setName(String name) {
 		this.name=name;
 	}
@@ -83,12 +72,12 @@ public class Continent {
 	}
 
 	public int getArmyValue() {
-		return army_value;
+		return control_value;
 	}
 		
 
 	public void setArmyValue(int army_value) {
-		this.army_value=army_value;
+		this.control_value=army_value;
 	}
 	
 	
@@ -98,4 +87,9 @@ public class Continent {
 	}
 
 
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "Continent Name "+ this.name;
+	}
 }

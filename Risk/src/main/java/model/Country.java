@@ -10,11 +10,12 @@ public class Country {
 	 */
 	private int country_id;
 	private String name;
-	private int continent_id;
+	private int no_of_armies;
+	
 	private List<Country> neighbors;
 	private Player owner_player;
 	private Continent continent;
-	private int no_of_armies;
+	
 	
 	
 	/**
@@ -26,7 +27,6 @@ public class Country {
 	
 		this.no_of_armies = 0;
 		this.name = name;
-		this.owner_player = new Player(0);
 		this.neighbors = new ArrayList<>();
 	}
 
@@ -44,23 +44,13 @@ public class Country {
 	}
 
 
-	public String getCountryName() {
+	public String getName() {
 		return name;
 	}
 
 
-	public void setCountryName(String name) {
+	public void setName(String name) {
 		this.name = name;
-	}
-
-
-	public int getContinent_id() {
-		return continent_id;
-	}
-
-
-	public void setContinent_id(int continent_id) {
-		this.continent_id = continent_id;
 	}
 
 
@@ -103,8 +93,10 @@ public class Country {
 		this.no_of_armies = no_of_armies;
 	}
 
-
-
-
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "Country Name "+ this.name;
+	}
 
 }

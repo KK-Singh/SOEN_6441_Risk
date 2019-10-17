@@ -8,7 +8,6 @@ public class Player {
 	
 	private String name;
 	private int player_id;
-	private Color player_color;
 	private List<Card> cards;
 	private int army;
 	private int army_left;
@@ -17,13 +16,9 @@ public class Player {
 	private List<Continent>occupied_continents;
 	
 	
-	
-	
-	
-	
 	//Default Constructor
-	public Player(int player_id) {
-		this.player_id = player_id;
+	public Player(String name) {
+		this.name = name;
 		this.alloccupied_countries = new ArrayList<>();
 		this.occupied_countries = new ArrayList<>();
 		this.cards = new ArrayList<>();
@@ -64,28 +59,6 @@ public class Player {
 	public void setPlayer_id(int player_id) {
 		this.player_id = player_id;
 	}
-
-
-
-
-
-
-	public Color getPlayer_color() {
-		return player_color;
-	}
-
-
-
-
-
-
-	public void setPlayer_color(Color player_color) {
-		this.player_color = player_color;
-	}
-
-
-
-
 
 
 	public List<Card> getCards() {
