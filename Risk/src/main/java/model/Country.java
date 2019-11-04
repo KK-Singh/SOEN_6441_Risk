@@ -10,10 +10,10 @@ public class Country {
 	 */
 	private int country_id;
 	private String name;
-	private int no_of_armies;
+	private int armyCount;
 	
 	private List<Country> neighbors;
-	private Player owner_player;
+	private Player countryOwner;
 	private Continent continent;
 	
 	
@@ -25,7 +25,7 @@ public class Country {
 	 */
 	public Country(String name) {
 	
-		this.no_of_armies = 0;
+		this.armyCount = 0;
 		this.name = name;
 		this.neighbors = new ArrayList<>();
 	}
@@ -54,13 +54,13 @@ public class Country {
 	}
 
 
-	public Player getOwner_player() {
-		return owner_player;
+	public Player getCountryOwner() {
+		return countryOwner;
 	}
 
 
-	public void setOwner_player(Player owner_player) {
-		this.owner_player = owner_player;
+	public void setCountryOwner(Player owner_player) {
+		this.countryOwner = owner_player;
 	}
 
 
@@ -84,13 +84,13 @@ public class Country {
 	}
 
 
-	public int getNo_of_armies() {
-		return no_of_armies;
+	public int getArmyCount() {
+		return armyCount;
 	}
 
 
-	public void setNo_of_armies(int no_of_armies) {
-		this.no_of_armies = no_of_armies;
+	public void setArmyCount(int no_of_armies) {
+		this.armyCount = no_of_armies;
 	}
 
 	@Override
