@@ -1,7 +1,6 @@
 package controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,8 +25,6 @@ public class MapVerification {
 		this.map1 = countryMap;
 		this.map2 = continentMap;
 	}
-
-
 
 	public ArrayList<String> correctionlist = new ArrayList<>();	
 	public ArrayList<String> ErrorList = new ArrayList<>();
@@ -63,7 +60,7 @@ public class MapVerification {
 			}
 		}
 	}
-//	checking if there is no neighbor and if country has itself as neighbor
+
 	public void Neighborcheck() {
 		int n = map1.size();
 		for (int i =0;i<n;i++) {
