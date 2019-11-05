@@ -8,18 +8,19 @@ import model.Continent;
 import model.Country;
 
 /**
- * @author World
- *
+ * MapVerification class implements the methods of the game
+ * @author Pegah
  */
 public class MapVerification {
 	Map<Integer,Country> map1;
 	Map<Integer,Continent>map2;
 	public static boolean error = false;
 	
-	
-	
-	
-	
+	/**
+	 * This method is used for the verifying of the map
+	 * @param countryMap : this is a map of country
+	 * @param continentMap : this is a map of continent
+	 */
 	public MapVerification(Map<Integer, Country> countryMap, Map<Integer, Continent> continentMap) {
 		super();
 		this.map1 = countryMap;
@@ -29,7 +30,11 @@ public class MapVerification {
 	public ArrayList<String> correctionlist = new ArrayList<>();	
 	public ArrayList<String> ErrorList = new ArrayList<>();
 	
-
+	/**
+	 * This method is used for the checking two ways of countries
+	 *
+	 *
+	 */
 	public void TwoWayCheck() {
 		for (int i=0;i<map1.size();i++) {
 			Country country = map1.get(map1.keySet().toArray()[i]);
@@ -44,7 +49,12 @@ public class MapVerification {
 		}
 		
 	}
-	
+	/**
+	 * This method is used for the connectivity of the graphs
+	 * @param country : this is an object of the country
+	 * @param queue : this is a queue of the country
+	 * @param continent : this is an object of continent
+	 */
 	public void graphConectivityCheck(Country country, Set<Country> queue, Continent continent) {
 		for(int i=0;i<country.getNeighbors().size();i++) {
 			Country neighborCountries = country.getNeighbors().get(i);
@@ -60,7 +70,9 @@ public class MapVerification {
 			}
 		}
 	}
-
+	/**
+	 * This method is used for checking neighbours
+	 */
 	public void Neighborcheck() {
 		int n = map1.size();
 		for (int i =0;i<n;i++) {
@@ -75,7 +87,10 @@ public class MapVerification {
 		}
 		
 	}
-	
+	/**
+	 * This method is used for checking the countries which are in multiple continents
+	 * 
+	 */
 	public void CountryInMultiContinentCheck() {
 		int n = map2.size();
 		for(int i =0; i<n;i++) {
@@ -91,14 +106,20 @@ public class MapVerification {
 			}
 		}
 	}
-	
+	/**
+	 * This method is used for checking if no countries or continents
+	 * 
+	 */
 	public void NoContinentOrCountry() {
 		if (map1.size() < 1 || map2.size() < 1) {
 			ErrorList.add("NO COUNTRY OR CONTINENT");
 		}
 
 	}
-	
+	/**
+	 * This method is used for checking which continents are not used
+	 * 
+	 */
 	public void ContinentUnusedCheck() {
 		
 //		creating a list of continent to check
@@ -121,6 +142,10 @@ public class MapVerification {
 		}
 	}
 	
+	/**
+	 * This method is used for checking every methods are validate or not
+	 * @return boolean
+	 */
 //method to call all check methods from UI
 	public boolean validateMethod() {
 //		TwoWayCheck();
