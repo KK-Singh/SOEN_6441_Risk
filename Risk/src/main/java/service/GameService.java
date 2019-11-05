@@ -19,12 +19,17 @@ import model.Country;
 import model.PhaseViewModel;
 import model.Player;
 /**
- * 
- * @author Pegah
- *
- */
+* This GameService file can contains the core functions
+* for the risk game.
+* @author  Yash
+* @version 1.2
+*/
 public class GameService {
-
+	
+	/**
+	* This method is used to load the map on the console.
+	* @param players list of players
+	*/
 	public void loadMapOnConsole(List<Player> players) {
 
 		players.forEach(player -> {
@@ -43,7 +48,13 @@ public class GameService {
 			});
 		});
 	}
-
+	
+	
+	/**
+	* This method is used to get army count based on number of players.
+	* @param players list of players
+	* @return int number of army for particular player
+	*/
 	public int getArmyCountBasedOnPlayers(List<Player> players) {
 		switch (players.size()) {
 		case 2:
@@ -58,7 +69,13 @@ public class GameService {
 			return 20;
 		}
 	}
-
+	
+	
+	/**
+	* This method is used to assign countries randomly
+	* to the particular player
+	* @param players list of players
+	*/
 	public void assignCountriesAtRandom(List<Player> players) {
 		Map<Integer, Country> countryMap = new HashMap<Integer, Country>();
 		MapService.getObject().countryMap.forEach((k, v) -> countryMap.put(k, v));
@@ -92,22 +109,40 @@ public class GameService {
 
 		}
 	}
-
+	
+	
+	/**
+	* This method is used to get player randomly
+	* @param players list of players
+	* @return Player it returns random player
+	*/
 	public Player getPlayerAtRandom(List<Player> players) {
 		int index = randomIndex(0, players.size());
 		return players.get(index);
 	}
 
+	
+	/**
+	* This method is used to index randomly
+	* @param min minimum value
+	* @param max maximum value
+	* @return int it returns random index
+	*/
 	public int randomIndex(int min, int max) {
 		return (int) (Math.random() * ((max - min) + 1)) + min;
 	}
 
+	
+	/**
+	* This is java main method
+	* @param args arguments for main method
+	*/
 	public static void main(String[] args) {
 		MapService service = MapService.getObject();
 		GameService gService = new GameService();
 
 		try {
-			service.readFile("C:\\Users\\Shivam\\Downloads\\RISK-1.0\\Resources\\Asia.map");
+			service.readFile("Resources\\Asia.map");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,6 +154,12 @@ public class GameService {
 
 	}
 
+	
+	/**
+	* This is method is used to reinforce the army 
+	* by setting army to player object
+	* @param player a single player object
+	*/
 	public void reinforcementArmy(Player player) {
 		int totalCountries = player.getPlayerCountries().size();
 		int totalArmy = 0;
@@ -145,6 +186,13 @@ public class GameService {
 		player.setArmy(totalArmy);
 	}
 
+	
+	/**
+	* This is method is used to set the army on the country 
+	* @param player a single player object
+	* @param countryName name of the country
+	* @param armyCount number of armies
+	*/
 	public void fillPlayerCountry(Player player, String countryName, int armyCount) {
 		player.getPlayerCountries().forEach(country -> {
 			if (country.getName().equalsIgnoreCase(countryName)) {
@@ -156,6 +204,15 @@ public class GameService {
 
 	}
 
+	
+	/**
+	* This is method is used to fortify the army from
+	* one country to another
+	* @param startCountry a single country object of source/start country
+	* @param destinationCountry a single country object of destination country
+	* @param armyToMove number of armies
+	* @return String a print/output statement
+	*/
 	public String fortifyPosition(Country startCountry, Country destinationCountry, int armyToMove) {
 		int startArmy = startCountry.getArmyCount();
 
@@ -174,6 +231,15 @@ public class GameService {
 		}
 	}
 	
+	
+	/**
+	* This is method is used to validate the fortification from
+	* one country to another
+	* @param fromCountry a single country object of source/start country
+	* @param toCountry a single country object of destination country
+	* @param armyToMove number of armies
+	* @return ArrayList a list of the Strings
+	*/
 	public List<String> validateFortification(Country fromCountry, Country toCountry,int armyToMove){
 		int startArmy = fromCountry.getArmyCount();
 		List<Country> fortifiableCountries = getFortifiableCountries(fromCountry);
@@ -194,6 +260,13 @@ public class GameService {
 		return result;
 	} 
 
+	
+	/**
+	* This is method is used to get the all possible fortifiable countries
+	* of the country
+	* @param territory a single country object
+	* @return ArrayList a list of all the fortifiable countries
+	*/
 	public List<Country> getFortifiableCountries(Country territory) {
 		Player player = territory.getCountryOwner();
 		List<Country> fortifiableTerritories = new ArrayList<>();
@@ -216,7 +289,14 @@ public class GameService {
 			fortifiableTerritories.remove(territory);
 		return fortifiableTerritories;
 	}
-
+	
+	
+	/**
+	* This is method is used to get check the ownership of the continent
+	* @param continent a single country object
+	* @param player a player object
+	* @return boolean true if continent is owned else false
+	*/
 	public boolean ifContinetOwned(Continent continent, Player player) {
 		List<Country> countries = player.getPlayerCountries();
 		List<Country> countriesInContinent = continent.getCountries();
@@ -229,12 +309,28 @@ public class GameService {
 		return true;
 	}
 
+	
+	/**
+	* This is method is used to check if game is ended or not
+	* @param player a player object
+	* @param totalCountries total count of the countries
+	* @return boolean true if game is ended else false
+	*/
 	public boolean ifGameEnded(Player player, int totalCountries) {
 		if(player.getPlayerCountries().size()==totalCountries)
 			return true;
 		return false;
 	}
 	
+	
+	/**
+	* This is method is used to validate number of dies
+	* @param attackerCountry a attacker country object
+	* @param defenderCountry a defender country object
+	* @param attackerTotalDice total number of dies of attacker
+	* @param defenderTotalDice total number of dies of defender
+	* @return boolean true if game is ended else false
+	*/
 	public String validateSelectedNumberOfDice(Country attackerCountry, Country defenderCountry, String attackerTotalDice, String defenderTotalDice) {
 		int totalAttackerDice, totalDefenderDice;
 		

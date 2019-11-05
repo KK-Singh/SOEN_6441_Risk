@@ -14,17 +14,31 @@ import java.util.Map;
 import controller.MapVerification;
 import model.Continent;
 import model.Country;
-
+/**
+* This MapService file can contains the core functions
+* for the risk game.
+* @author  Yash
+* @version 1.2
+*/
 public class MapService {
 
 	public Map<Integer, Continent> continentMap = new HashMap<Integer, Continent>();
 	public Map<Integer, Country> countryMap = new HashMap<Integer, Country>();
 	private static MapService obj;
-
+	
+	
+    /** MapService constructor */
 	private MapService() {
 		// TODO Auto-generated constructor stub
 	}
 
+	
+	/**
+	* This method is used to get the MapService object
+	* if object is not yet created then it create object first
+	* and then return the MapService object
+	* @return MapService object of MapService
+	*/
 	public static MapService getObject() {
 		if (obj == null) {
 			obj = new MapService();
@@ -33,6 +47,12 @@ public class MapService {
 		return obj;
 	}
 
+	
+	/**
+	* This method is used to read the map file
+	* and add continents, countries and neighbors of the countries
+	* @param filePath path of the file that going to be read
+	*/
 	public void readFile(String filePath) throws IOException {
 
 		File file = new File(filePath);
@@ -90,6 +110,12 @@ public class MapService {
 		br.close();
 	}
 
+	
+	/**
+	* This method is used to save the map file
+	* @param filePath path of the file that going to be read
+	* @exception IOException if stream to file cannot be written to or closed. 
+	*/
 	public void saveFile(String filePath) throws Exception {
 
 		File file = new File(filePath);
@@ -138,7 +164,12 @@ public class MapService {
 	}
 
 	// adding continent
-
+	/**
+	* This method is used to add continent in continent map object
+	* @param continentname name of the continent
+	* @param continentvalue continent value
+	* @return String it returns statement of operation
+	*/
 	public String addContinent(String continentname, int continentvalue) {
 		try {
 			Continent continent = new Continent(continentvalue, continentname);
@@ -152,6 +183,12 @@ public class MapService {
 		return continentname + " Added Successfully";
 	}
 
+	
+	/**
+	* This method is used to remove continent in continent map object
+	* @param continentname name of the continent
+	* @return String it returns statement of operation
+	*/
 	public String removeContinent(String continentname) {
 		try {
 
@@ -189,7 +226,15 @@ public class MapService {
 		return continentname + " removed successfully";
 
 	}
-
+	
+	
+	/**
+	* This method is used to add country in country map object
+	* and set the continent for the country
+	* @param countryName name of the country
+	* @param continentName name of the continent
+	* @return String it returns statement of operation
+	*/
 	public String addCountry(String countryName, String continentName) {
 		// Continent continent = new Continent(continentvalue, continentname);
 		try {
@@ -208,7 +253,13 @@ public class MapService {
 		return countryName + " Added Successfully";
 		// continentMap.put(id, continent);
 	}
-
+	
+	
+	/**
+	* This method is used to remove country in country map object
+	* @param countryName name of the country
+	* @return String it returns statement of operation
+	*/
 	public String removeCountry(String countryName) {
 		try {
 			Iterator<Integer> ite = countryMap.keySet().iterator();
@@ -238,6 +289,13 @@ public class MapService {
 		return countryName + " removed successfully";
 	}
 
+
+	/**
+	* This method is used to add neighbor from country to another country
+	* @param countryname name of the country
+	* @param neighbourcountryname name of the neighbor country
+	* @return String it returns neighbor country name and result of operation
+	*/
 	public String addNeighbour(String countryname, String neighbourcountryname) {
 		try {
 			Country country1 = getCountry(countryname);
@@ -262,7 +320,14 @@ public class MapService {
 		return neighbourcountryname + " added successfully";
 
 	}
-
+	
+	
+	/**
+	* This method is used to remove neighbor from country to another country
+	* @param countryname name of the country
+	* @param neighbourcountryname name of the neighbor country
+	* @return String it returns neighbor country name and result of operation
+	*/
 	public String removeNeighbour(String countryname, String neighbourcountryname) {
 		try {
 			Country country1 = getCountry(countryname);
@@ -287,6 +352,9 @@ public class MapService {
 		return neighbourcountryname + " removed successfully";
 	}
 
+	/**
+	* This method is used to show the map on the console.
+	*/
 	public void showMap() {
 		continentMap.forEach((k, v) -> {
 			System.out.println("Continent is " + v);
@@ -296,7 +364,13 @@ public class MapService {
 			});
 		});
 	}
-
+	
+	
+	/**
+	* This method is used to get country object
+	* @param name name of the country
+	* @return Country it returns country object if exists
+	*/
 	public Country getCountry(String name) {
 
 		Iterator<Integer> ite = countryMap.keySet().iterator();
@@ -310,7 +384,13 @@ public class MapService {
 		return null;
 
 	}
-
+	
+	
+	/**
+	* This method is used to get continent object
+	* @param name name of the continent
+	* @return Continent it returns continent object if exists
+	*/
 	public Continent getContinent(String name) {
 		Iterator<Integer> ite = continentMap.keySet().iterator();
 
@@ -323,6 +403,11 @@ public class MapService {
 		return null;
 	}
 
+	
+	/**
+	* This method is used to validate the map
+	* @return boolean it returns true if map is valid else false
+	*/
 	public boolean mapValidate() {
 		MapVerification mapVerification = new MapVerification(countryMap, continentMap);
 		if (!mapVerification.validateMethod()) {
@@ -332,6 +417,11 @@ public class MapService {
 		return true;
 	}
 
+	
+	/**
+	* This is java main method
+	* @param args arguments for main method
+	*/
 	public static void main(String[] args) {
 
 		MapService service = new MapService();
