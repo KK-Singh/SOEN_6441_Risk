@@ -36,34 +36,33 @@ public class MapController {
 	}
 
 	public String addContinent(String continentname, int continentvalue) {
-		serviceObj.addContinent(continentname, continentvalue);
-		return continentname+ " Added Successfully";
+		return serviceObj.addContinent(continentname, continentvalue);
 	}
 	
 	public String removeContinent(String continentname) {
-		serviceObj.removeContinent(continentname);
-		return continentname + " Removed Successfully";
+		return serviceObj.removeContinent(continentname);
+
 	}
 	
 	
 	public String addCountry(String countryName, String continentName) {
-		serviceObj.addCountry(countryName, continentName);
-		return countryName + " Added Successfully";
+		return serviceObj.addCountry(countryName, continentName);
+		
 	}
 	
 	public String removeCountry(String countryName) {
-		serviceObj.removeCountry(countryName);
-		return countryName + " Removed Successfully";
+		return serviceObj.removeCountry(countryName);
+
 	}
 	
 	public String addNeighbour(String countryname, String neighbourcountryname) {
-		serviceObj.addNeighbour(countryname, neighbourcountryname);
-		return neighbourcountryname + " Added Successfully";
+		return serviceObj.addNeighbour(countryname, neighbourcountryname);
+
 	}
 	
 	public String removeNeighbour(String countryname, String neighbourcountryname) {
-		serviceObj.removeNeighbour(countryname, neighbourcountryname);
-		return neighbourcountryname + " Removed Successfully";
+		return serviceObj.removeNeighbour(countryname, neighbourcountryname);
+
 	}
 	
 	public void showMap() {

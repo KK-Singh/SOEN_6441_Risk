@@ -49,7 +49,7 @@ public class CardExchangeView implements Observer {
 	}
 
 	private void exchangeCards() {
-		BufferedReader br = StartGame_Temp.br;
+		BufferedReader br = StartGame.br;
 		String input =null;
 		System.out.println("Enter Command to exchange the cards");
 		while (true) {

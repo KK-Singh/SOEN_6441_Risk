@@ -12,7 +12,7 @@ import controller.MapController;
 import javafx.util.Pair;
 import model.Player;
 
-public class StartGame_Temp {
+public class StartGame {
 
 	static List<Player> playerList;
 	static int playerTurn = 0;
@@ -22,7 +22,7 @@ public class StartGame_Temp {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 	public static void main(String[] args) throws IOException {
-		StartGame_Temp startGameObj = new StartGame_Temp();
+		StartGame startGameObj = new StartGame();
 
 		String input;
 		System.out.println("----------------Welcome to Risk Game---------------");
@@ -38,17 +38,19 @@ public class StartGame_Temp {
 			input = br.readLine();
 
 			if (input.equalsIgnoreCase("1")) {
-
 				startGameObj.createMapHelper(br, input, startGameObj);
 				break;
 			} else if (input.equalsIgnoreCase("2")) {
-
+				System.out.println("Enter valid editmap command ");
+				input = br.readLine();
 				String arr[] = input.split(" ");
 				if (startGameObj.validateEditMapCommand(input)) {
 					startGameObj.loadMap(arr[1]);
 					System.out.println("Enter Map editor command to edit the loaded map");
 					startGameObj.createMapHelper(br, input, startGameObj);
 					break;
+				} else {
+					System.out.println("No valid edit map command given");
 				}
 
 			} else if (input.equalsIgnoreCase("3")) {
@@ -64,10 +66,18 @@ public class StartGame_Temp {
 		while (true) {
 			input = br.readLine();
 			String filePath = startGameObj.validateLoadMapCommands(input);
-			if (filePath != null) {
-				startGameObj.loadMap(filePath);
-				break;
-			} else {
+			try {
+				if (filePath != null) {
+					String answer = startGameObj.loadMap(filePath);
+					if (answer.startsWith("File"))
+						break;
+//					else
+//						System.out.println("Enter Valid Load Map Command");
+				} else {
+					System.out.println("Enter Valid Load Map Command");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("Enter Valid Load Map Command");
 			}
 		}
@@ -240,7 +250,7 @@ public class StartGame_Temp {
 				if (startGameObj.validateFortificationCommand(input)) {
 					try {
 						if (arr.length == 2 && arr[1].equalsIgnoreCase("-none")) {
-							startGameObj.gameController.fortify(player, null, null,0);
+							startGameObj.gameController.fortify(player, null, null, 0);
 							System.out.println("No Fortification");
 							break;
 						}
@@ -301,13 +311,16 @@ public class StartGame_Temp {
 		return true;
 	}
 
-	public void loadMap(String filePath) {
-		mapController.readFile(filePath);
-		System.out.println("Entered Map is ::: ");
-		mapController.showMap();
+	public String loadMap(String filePath) {
+		String answer = mapController.readFile(filePath);
+		if (answer.startsWith("File")) {
+			System.out.println("Entered Map is ::: ");
+			mapController.showMap();
+		}
+		return answer;
 	}
 
-	public void createMapHelper(BufferedReader br, String input, StartGame_Temp startGameObj) throws IOException {
+	public void createMapHelper(BufferedReader br, String input, StartGame startGameObj) throws IOException {
 		List<String> possibleValues = new ArrayList<String>();
 		possibleValues.add("editcontinent");
 		possibleValues.add("editcountry");
@@ -450,6 +463,7 @@ public class StartGame_Temp {
 		return false;
 	}
 
+	
 	private boolean validateEditMapCommand(String input) {
 		String arr[] = input.split(" ");
 		if (arr[0].equalsIgnoreCase("editmap")) {

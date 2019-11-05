@@ -43,12 +43,12 @@ public class MapService {
 		int country_id = 0;
 		while ((input = br.readLine()) != null) {
 
-			if (input.contains("Continent")) {
+			if (input.contains("Continents")) {
 				while ((input = br.readLine()) != "") {
 					if (input.trim().isEmpty())
 						break;
 					String[] cont = input.split("=");
-					
+
 					Continent c = new Continent(Integer.valueOf(cont[1]), cont[0].replaceAll("\\s", "").toLowerCase());
 					continentMap.put(cont_id, c);
 					cont_id++;
@@ -96,132 +96,195 @@ public class MapService {
 		PrintWriter pw = new PrintWriter(file);
 		pw.println("[Continents]");
 		continentMap.forEach((k, v) -> {
-			pw.println(v.getName() + " " + v.getArmyValue());
+			pw.println(v.getName() + "=" + v.getArmyValue());
 		});
 
 		pw.println();
 		pw.println("[Territories]");
-		// String prevCont;
 
-		countryMap.forEach((k, v) -> {
-			pw.print(v.getName() + "," + v.getContinent().getName() + ",");
-			for (int i = 0; i < v.getNeighbors().size(); i++) {
-				pw.print(v.getNeighbors().get(i).getName());
-				if (i < v.getNeighbors().size() - 1)
+		Iterator<Integer> ite = countryMap.keySet().iterator();
+		String prevCont = null;
+		int fKey = ite.next();
+		prevCont = countryMap.get(fKey).getName();
+		ite = countryMap.keySet().iterator();
+		while (ite.hasNext()) {
+			int key = ite.next();
+			Country cont = countryMap.get(key);
+			String curCont = cont.getContinent().getName();
+			pw.print(cont.getName() + "," +"0,0,"+ cont.getContinent().getName() + ",");
+			for (int i = 0; i < cont.getNeighbors().size(); i++) {
+				pw.print(cont.getNeighbors().get(i).getName());
+				if (i < cont.getNeighbors().size() - 1)
 					pw.print(",");
 			}
 			pw.println();
-		});
+			if (prevCont != curCont) {
+				pw.println();
+			}
+			prevCont = curCont;
+		}
+		// countryMap.forEach((k, v) -> {
+		//
+		// pw.print(v.getName() + "," + v.getContinent().getName() + ",");
+		// for (int i = 0; i < v.getNeighbors().size(); i++) {
+		// pw.print(v.getNeighbors().get(i).getName());
+		// if (i < v.getNeighbors().size() - 1)
+		// pw.print(",");
+		// }
+		// pw.println();
+		// });
 		pw.println();
 		pw.close();
 	}
 
 	// adding continent
 
-	public void addContinent(String continentname, int continentvalue) {
-		Continent continent = new Continent(continentvalue, continentname);
-		int id = continentMap.size() + 1;
-		continentMap.put(id, continent);
-	}
-
-	public void removeContinent(String continentname) {
-		Iterator<Integer> ite = continentMap.keySet().iterator();
-		List<Country> continentCountries = new ArrayList<Country>();
-		while (ite.hasNext()) {
-			int key = ite.next();
-			if (continentMap.get(key).getName().equalsIgnoreCase(continentname)) {
-				continentCountries = continentMap.get(key).getCountries();
-				ite.remove();
-
-				break;
-			}
+	public String addContinent(String continentname, int continentvalue) {
+		try {
+			Continent continent = new Continent(continentvalue, continentname);
+			int id = continentMap.size() + 1;
+			continentMap.put(id, continent);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return continentname + " Cannot be added";
 		}
 
-		ite = countryMap.keySet().iterator();
+		return continentname + " Added Successfully";
+	}
 
-		while (ite.hasNext()) {
-			int key = ite.next();
-			if (continentCountries.contains(countryMap.get(key))) {
-				Country c = countryMap.get(key);
-				List<Country> neighbours = c.getNeighbors();
-				neighbours.forEach(cont -> {
-					cont.getNeighbors().remove(c);
-				});
-				ite.remove();
+	public String removeContinent(String continentname) {
+		try {
+
+			Iterator<Integer> ite = continentMap.keySet().iterator();
+			List<Country> continentCountries = new ArrayList<Country>();
+			while (ite.hasNext()) {
+				int key = ite.next();
+				if (continentMap.get(key).getName().equalsIgnoreCase(continentname)) {
+					continentCountries = continentMap.get(key).getCountries();
+					ite.remove();
+
+					break;
+				}
 			}
+
+			ite = countryMap.keySet().iterator();
+
+			while (ite.hasNext()) {
+				int key = ite.next();
+				if (continentCountries.contains(countryMap.get(key))) {
+					Country c = countryMap.get(key);
+					List<Country> neighbours = c.getNeighbors();
+					neighbours.forEach(cont -> {
+						cont.getNeighbors().remove(c);
+					});
+					ite.remove();
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return continentname + " Cannot be removed";
 		}
+
+		return continentname + " removed successfully";
 
 	}
 
-	public void addCountry(String countryName, String continentName) {
+	public String addCountry(String countryName, String continentName) {
 		// Continent continent = new Continent(continentvalue, continentname);
-		Continent cont = getContinent(continentName);
-		Country country = new Country(countryName);
-		country.setContinent(cont);
-		List<Country> countries = cont.getCountries();
-		countries.add(country);
-		cont.setCountries(countries);
-		int id = countryMap.size() + 1;
-		countryMap.put(id, country);
+		try {
+			Continent cont = getContinent(continentName);
+			Country country = new Country(countryName);
+			country.setContinent(cont);
+			List<Country> countries = cont.getCountries();
+			countries.add(country);
+			cont.setCountries(countries);
+			int id = countryMap.size() + 1;
+			countryMap.put(id, country);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return countryName + " Cannot be added";
+		}
+		return countryName + " Added Successfully";
 		// continentMap.put(id, continent);
 	}
 
-	public void removeCountry(String countryName) {
-		Iterator<Integer> ite = countryMap.keySet().iterator();
-		Country countryToRemove = null;
-		Continent continent;
-		while (ite.hasNext()) {
-			int key = ite.next();
-			if (countryMap.get(key).getName().equalsIgnoreCase(countryName)) {
-				countryToRemove = countryMap.get(key);
-				ite.remove();
-				break;
+	public String removeCountry(String countryName) {
+		try {
+			Iterator<Integer> ite = countryMap.keySet().iterator();
+			Country countryToRemove = null;
+			Continent continent;
+			while (ite.hasNext()) {
+				int key = ite.next();
+				if (countryMap.get(key).getName().equalsIgnoreCase(countryName)) {
+					countryToRemove = countryMap.get(key);
+					ite.remove();
+					break;
+				}
 			}
+			continent = countryToRemove.getContinent();
+			continent.getCountries().remove(countryToRemove);
+			List<Country> neighbouringCountries = countryToRemove.getNeighbors();
+			Country finalCountryToRemove = countryToRemove;
+			neighbouringCountries.forEach(cont -> {
+				cont.getNeighbors().remove(finalCountryToRemove);
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return countryName + " cannot be removed";
 		}
-		continent = countryToRemove.getContinent();
-		continent.getCountries().remove(countryToRemove);
-		List<Country> neighbouringCountries = countryToRemove.getNeighbors();
-		Country finalCountryToRemove = countryToRemove;
-		neighbouringCountries.forEach(cont -> {
-			cont.getNeighbors().remove(finalCountryToRemove);
-		});
+
+		return countryName + " removed successfully";
+	}
+
+	public String addNeighbour(String countryname, String neighbourcountryname) {
+		try {
+			Country country1 = getCountry(countryname);
+			Country country2 = getCountry(neighbourcountryname);
+
+			List<Country> neighbourList1 = country1.getNeighbors();
+			List<Country> neighbourList2 = country2.getNeighbors();
+
+			if (!neighbourList2.contains(country1)) {
+				neighbourList2.add(country1);
+			}
+
+			if (!neighbourList1.contains(country2)) {
+				neighbourList1.add(country2);
+
+			}
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			return neighbourcountryname + " cannot be added";
+		}
+		return neighbourcountryname + " added successfully";
 
 	}
 
-	public void addNeighbour(String countryname, String neighbourcountryname) {
-		Country country1 = getCountry(countryname);
-		Country country2 = getCountry(neighbourcountryname);
+	public String removeNeighbour(String countryname, String neighbourcountryname) {
+		try {
+			Country country1 = getCountry(countryname);
+			Country country2 = getCountry(neighbourcountryname);
+			List<Country> neighbourList1 = country1.getNeighbors();
+			List<Country> neighbourList2 = country2.getNeighbors();
 
-		List<Country> neighbourList1 = country1.getNeighbors();
-		List<Country> neighbourList2 = country2.getNeighbors();
+			if (neighbourList1.contains(country2)) {
+				neighbourList1.remove(country2);
 
-		if (!neighbourList2.contains(country1)) {
-			neighbourList2.add(country1);
+			}
+
+			if (neighbourList2.contains(country1)) {
+				neighbourList2.remove(country1);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return neighbourcountryname + " cannot be removed";
 		}
 
-		if (!neighbourList1.contains(country2)) {
-			neighbourList1.add(country2);
-
-		}
-
-	}
-
-	public void removeNeighbour(String countryname, String neighbourcountryname) {
-		Country country1 = getCountry(countryname);
-		Country country2 = getCountry(neighbourcountryname);
-		List<Country> neighbourList1 = country1.getNeighbors();
-		List<Country> neighbourList2 = country2.getNeighbors();
-
-		if (neighbourList1.contains(country2)) {
-			neighbourList1.remove(country2);
-
-		}
-
-		if (neighbourList2.contains(country1)) {
-			neighbourList2.remove(country1);
-
-		}
-
+		return neighbourcountryname + " removed successfully";
 	}
 
 	public void showMap() {
@@ -305,13 +368,14 @@ public class MapService {
 		service.addNeighbour("Philippines", "NewCountry2");
 
 		System.out.println("BEFORE------------------------------------");
-//		continentMap.forEach((k, v) -> {
-//			System.out.println("Continent is " + v);
-//			v.getCountries().forEach(cont -> {
-//				System.out.println("Countries in the continent are " + cont);
-//				cont.getNeighbors().forEach(temp -> System.out.println("Neighbouring Countries " + temp));
-//			});
-//		});
+		// continentMap.forEach((k, v) -> {
+		// System.out.println("Continent is " + v);
+		// v.getCountries().forEach(cont -> {
+		// System.out.println("Countries in the continent are " + cont);
+		// cont.getNeighbors().forEach(temp -> System.out.println("Neighbouring
+		// Countries " + temp));
+		// });
+		// });
 
 		// service.removeContinent("NewContinent");
 		// service.removeCountry("NewCountry");
