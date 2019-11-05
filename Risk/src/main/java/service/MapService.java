@@ -11,10 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import controller.MapVerification;
 import model.Continent;
 import model.Country;
-import view.StartGame;
-import controller.MapVerification;
 
 public class MapService {
 
@@ -49,7 +48,8 @@ public class MapService {
 					if (input.trim().isEmpty())
 						break;
 					String[] cont = input.split("=");
-					Continent c = new Continent(Integer.valueOf(cont[1]), cont[0]);
+					
+					Continent c = new Continent(Integer.valueOf(cont[1]), cont[0].replaceAll("\\s", "").toLowerCase());
 					continentMap.put(cont_id, c);
 					cont_id++;
 				}
@@ -61,21 +61,21 @@ public class MapService {
 						continue;
 					String[] countryIn = input.split(",");
 					String continentName = countryIn[3];
-					Country country = getCountry(countryIn[0]);
+					Country country = getCountry(countryIn[0].replaceAll("\\s", "").toLowerCase());
 					if (country == null) {
-						country = new Country(countryIn[0]);
+						country = new Country(countryIn[0].replaceAll("\\s", "").toLowerCase());
 						countryMap.put(country_id, country);
 						country_id++;
 					}
 
-					Continent countryContinent = getContinent(continentName);
+					Continent countryContinent = getContinent(continentName.replaceAll("\\s", "").toLowerCase());
 					countryContinent.addCountry(country);
 
 					List<Country> nearByCountries = new ArrayList<Country>();
 					for (int i = 4; i < countryIn.length; i++) {
-						Country c = getCountry(countryIn[i]);
+						Country c = getCountry(countryIn[i].replaceAll("\\s", "").toLowerCase());
 						if (c == null) {
-							c = new Country(countryIn[i]);
+							c = new Country(countryIn[i].replaceAll("\\s", "").toLowerCase());
 							countryMap.put(country_id, c);
 							country_id++;
 						}
