@@ -12,6 +12,14 @@ import controller.MapController;
 import javafx.util.Pair;
 import model.Player;
 
+
+/**
+* StartGame Class is the start of the risk game.  
+* 
+* @author Kunal
+* @version 1.2
+*/
+
 public class StartGame {
 
 	static List<Player> playerList;
@@ -21,6 +29,11 @@ public class StartGame {
 	GameController gameController = new GameController();
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
+/**
+ * Main method where game starts
+ * 	
+ */
+	
 	public static void main(String[] args) throws IOException {
 		StartGame startGameObj = new StartGame();
 
@@ -293,6 +306,13 @@ public class StartGame {
 
 	}
 
+	/**
+	 * Parsing method of StartUp Command
+	 * @param command :Command from console
+	 * @param playerTurn :playerTurn while game is running
+	 * @return : boolean
+	 * 	
+	 */
 	public boolean parseStartupCommand(String command, int playerTurn) {
 		String[] args = command.trim().split(" ");
 		switch (args[0]) {
@@ -319,7 +339,14 @@ public class StartGame {
 		}
 		return answer;
 	}
-
+	
+/**
+ * This method is helping in creating of map 
+ * @param br : buffer reader 
+ * @param input : String after parsing the command
+ * @param stargameObj : GameObject upon which map command would be executed
+ * 
+ */
 	public void createMapHelper(BufferedReader br, String input, StartGame startGameObj) throws IOException {
 		List<String> possibleValues = new ArrayList<String>();
 		possibleValues.add("editcontinent");
@@ -358,6 +385,11 @@ public class StartGame {
 		}
 
 	}
+	
+	/**
+	 * editPlayer method is used for adding or removing the player as per given command
+	 * @param args : editPlayer commands 
+	 */
 
 	public void editPlayer(String[] args) {
 		switch (args[1]) {
@@ -385,6 +417,11 @@ public class StartGame {
 			System.out.println("Enter valid Player command");
 		}
 	}
+	
+	/**
+	 * editCountry is used for adding or removing country  as per given Command
+	 * @param args :editCountry Commands
+	 */
 
 	public void editCountry(String[] args) {
 		switch (args[1]) {
@@ -400,6 +437,10 @@ public class StartGame {
 
 	}
 
+	/**
+	 * editContinent is used for adding or removing continent  as per given Command
+	 * @param args :editContinent Commands
+	 */
 	public void editContinent(String[] args) {
 
 		switch (args[1]) {
@@ -415,6 +456,10 @@ public class StartGame {
 
 	}
 
+	/**
+	 * editNeighbor is used for adding or removing country's neighbor country  as per given Command
+	 * @param args :editNeighbor Commands
+	 */
 	public void editNeighbor(String[] args) {
 
 		switch (args[1]) {
@@ -429,10 +474,18 @@ public class StartGame {
 		}
 	}
 
+	/**
+	 * showMap method is used to view the map
+	 */
 	public void showMap() {
 		mapController.showMap();
 	}
 
+	/**
+	 * saveFile method is to save the map
+	 * @param filePath : where map is to be saved
+	 */
+	
 	public void saveFile(String filePath) {
 		if (mapController.validateMap()) {
 			System.out.println(mapController.saveFile(filePath));
@@ -441,10 +494,19 @@ public class StartGame {
 		}
 	}
 
+	/**
+	 * validateMapCommand call the validateMap method
+	 */
+	
 	public void validateMapCommand() {
 		mapController.validateMap();
 	}
 
+	/**
+	 * It is used to validate load map command
+	 * @param input :load map command
+	 * @return
+	 */
 	private String validateLoadMapCommands(String input) {
 		String[] arr = input.split(" ");
 		if (arr[0].equalsIgnoreCase("loadmap")) {
@@ -454,6 +516,12 @@ public class StartGame {
 		}
 	}
 
+	/**
+	 * It is used to validate map editor command
+	 * @param input :map editor command 
+	 * @param possibleValues : list of map editor command
+	 * @return : boolean whether map editor command it correct!
+	 */
 	private boolean validateMapEditorCommands(String input, List<String> possibleValues) {
 
 		String arr[] = input.split(" ");
@@ -463,7 +531,6 @@ public class StartGame {
 		return false;
 	}
 
-	
 	private boolean validateEditMapCommand(String input) {
 		String arr[] = input.split(" ");
 		if (arr[0].equalsIgnoreCase("editmap")) {
@@ -472,6 +539,12 @@ public class StartGame {
 		return false;
 	}
 
+	/**
+	 * It is used to validate player command
+	 * @param input :player related command
+	 * @return :boolean if player related command is correct. 
+	 */
+	
 	private boolean validatePlayerCommand(String input) {
 		String[] arr = input.split(" ");
 		if (arr[0].equalsIgnoreCase("gameplayer")) {
@@ -480,6 +553,11 @@ public class StartGame {
 		return false;
 	}
 
+	
+	/**
+	 * This method is used to check if the startup Phase has ended
+	 * @return :boolean
+	 */
 	private boolean ifStartupPhaseEnd() {
 		for (Player player : playerList) {
 			if (player.getArmy() > 0) {
@@ -489,6 +567,12 @@ public class StartGame {
 		return true;
 	}
 
+	/**
+	 * this method is check the validity of reinforcement commmand
+	 * @param input reinforcement command
+	 * @return boolean
+	 */
+	
 	private boolean validateReinforcementCommand(String input) {
 		String[] arr = input.split(" ");
 		if (arr[0].equalsIgnoreCase("reinforce")) {
@@ -500,6 +584,11 @@ public class StartGame {
 		return false;
 	}
 
+	/**
+	 * This method is to validate the attack command
+	 * @param input attack related command
+	 * @return boolean
+	 */
 	private boolean validateAttackCommand(String input) {
 		String[] arr = input.split(" ");
 		if (arr[0].equalsIgnoreCase("attack") || arr[0].equalsIgnoreCase("defend")
@@ -509,6 +598,12 @@ public class StartGame {
 		return false;
 	}
 
+	/**
+	 * this method is to validate the fortification command
+	 * @param input fortification related command
+	 * @return boolean
+	 */
+	
 	private boolean validateFortificationCommand(String input) {
 		String[] arr = input.split(" ");
 		if (arr[0].equalsIgnoreCase("fortify")) {
@@ -518,6 +613,14 @@ public class StartGame {
 
 	}
 
+	/**
+	 * This method helps in moving army after attack
+	 * @param player current player 
+	 * @param input attack command
+	 * @param attackCountry country which is attacking
+	 * @param defendCountry country upon attack
+	 * @throws IOException
+	 */
 	private void moveArmyForAttackHelper(Player player, String input, String attackCountry, String defendCountry)
 			throws IOException {
 		while (true) {
@@ -534,6 +637,11 @@ public class StartGame {
 		}
 	}
 
+	/**
+	 * This method validate Army move command for attack
+	 * @param input command
+	 * @return boolean
+	 */
 	private boolean validateArmyMoveComandForAttack(String input) {
 		String arr[] = input.split(" ");
 		if (arr[0].equalsIgnoreCase("attackmove")) {
