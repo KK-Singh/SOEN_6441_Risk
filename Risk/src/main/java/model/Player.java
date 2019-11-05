@@ -7,60 +7,108 @@ import java.util.Random;
 
 import javafx.util.Pair;
 import service.MapService;
-
+/**
+@author Gurwinder Kaur 
+*/
 public class Player {
-
+/**
+ * 	name  : Represents name
+ */
 	private String name;
+	/**
+	 * player_id  : Represents player id
+	 */
 	private int player_id;
+	/**
+	 * cards : Represents cards
+	 */
 	private List<Card> cards;
+	/**
+	 * 	army : Represents army
+	 */
 	private int army;
+	/**
+	 * playerCountries : Represents players country
+	 */
 	private List<Country> playerCountries;
 
-	// Default Constructor
+	/**
+	 * This constructor is for initialization of Player
+	 * @param name : set the name
+	 */
 	public Player(String name) {
 		this.name = name;
 		this.playerCountries = new ArrayList<>();
 		this.cards = new ArrayList<>();
 	}
 
-	// get and set methods
-
+	/**
+	 * This method get the player name 
+	 * @return name : get the player name 
+	 */
 	public String getPlayerName() {
 		return name;
 	}
-
+	/**
+	 * This method set the player name 
+	 * @param name : sets the player name 
+	 */
 	public void setPlayerName(String name) {
 		this.name = name;
 	}
-
+	/** 
+	 * This method get the player id
+	 * @return player id : get the player id 
+	 */
 	public int getPlayer_id() {
 		return player_id;
 	}
-
+	/**
+	 * This method set the player id
+	 * @param player_id : sets the player id 
+	 */
 	public void setPlayer_id(int player_id) {
 		this.player_id = player_id;
 	}
-
+	/**
+	 * This method get the cards 
+	 * @return cards 
+	 */
 	public List<Card> getCards() {
 		return cards;
 	}
-
+	/**
+	 * this method set the cards 
+	 * @param cards : set the cards 
+	 */
 	public void setCards(List<Card> cards) {
 		this.cards = cards;
 	}
-
+	/**
+	 * this method get the army
+	 * @return army : army
+	 */
 	public int getArmy() {
 		return army;
 	}
-
+	/**
+	 * This method set the army
+	 * @param army : army
+	 */
 	public void setArmy(int army) {
 		this.army = army;
 	}
-
+	/**
+	 * This method get the player country
+	 * @return playerCountries : get the player country
+	 */
 	public List<Country> getPlayerCountries() {
 		return playerCountries;
 	}
-
+	/**
+	 * This method set the player countries
+	 * @param alloccupied_countries : set the player country
+	 */
 	public void setPlayerCountries(List<Country> alloccupied_countries) {
 		this.playerCountries = alloccupied_countries;
 	}
@@ -74,7 +122,17 @@ public class Player {
 		fromCountry.setArmyCount(fromCountry.getArmyCount()-armiesToMove);
 		toCountry.setArmyCount(toCountry.getArmyCount()+armiesToMove);
 	}
-	
+	/**
+	 * This method for attack phase
+	 * @param attackerCountry : attacker country
+	 * @param defenderCountry : defender country
+	 * @param defender : defender
+	 * @param ifAllOut : if all out
+	 * @param totalAttackerDice : total attacker dice
+	 * @param totalDefenderDice : total defender dice
+	 * @param phaseViewModel : phase view model
+	 * @return pair : get the new pair
+	 */
 	public Pair<Boolean, Integer> attack(Country attackerCountry, Country defenderCountry, Player defender, boolean ifAllOut, int totalAttackerDice, int totalDefenderDice, PhaseViewModel phaseViewModel ){
 		boolean ifWon = false;
 		int leftTroop = -1;
@@ -117,7 +175,15 @@ public class Player {
 		}
 		
 	}
-
+/**
+ * This method is helper method for  attack() 
+ * @param attackerCountry : attacker country
+ * @param defenderCountry  : defender country
+ * @param attackerDiceResult  : attacker dice result
+ * @param defenderDiceResult : defender dice result
+ * @param phaseViewModel : phase view model
+ * @return leftTroops : get the left troop
+ */
 	public int attackHelper(Country attackerCountry, Country defenderCountry, List<Integer> attackerDiceResult,
 			List<Integer> defenderDiceResult, PhaseViewModel phaseViewModel) {
 		
@@ -145,7 +211,12 @@ public class Player {
 		
 		return leftTroops;
 	}
-	
+	/**
+	 * diceRollResult() to return results of dice
+	 * @param armyCount : army count
+	 * @param ifAttacker  : current attacker 
+	 * @return result  : get the result 
+	 */
 	public List<Integer> diceRollResult(int armyCount, boolean ifAttacker) {
 		Random random = new Random();
 		List<Integer> result = new ArrayList<>();
