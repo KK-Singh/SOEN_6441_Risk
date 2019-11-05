@@ -15,17 +15,33 @@ import model.Card;
 import model.CardViewModel;
 import model.Country;
 import model.Player;
-
+/**
+* This PhaseView file can contains the observer method
+* of the risk game.
+* @author  Yash
+* @version 1.2
+*/
 public class CardExchangeView implements Observer {
-
+	
+	/** Player current player object*/
 	private Player curPlayer;
 
+	
+	/** CardViewModel cardview model object*/
 	CardViewModel cardViewModel;
-
+	
+	/** boolean flag for country ownership*/
 	boolean ifCardIsOfOwnedCountry = false;
 
+	/** Country card owned country object*/
 	Country cardOwnedCountry;
 
+
+	/**
+	* This method is used to update the observers of the cardviewmodel
+	* @param o cardviewmodel observable object
+	* @param arg cardviewmodel observable object
+	*/
 	@Override
 	public void update(Observable o, Object arg) {
 		cardViewModel = (CardViewModel) o;
@@ -47,7 +63,13 @@ public class CardExchangeView implements Observer {
 
 		System.out.println("-------------------CARD EXCHANGE VIEW END------------------");
 	}
-
+	
+	
+	/**
+	* This method is used to exchange the cards
+	* and it print the response as per the operations on 
+	* the console.
+	*/
 	private void exchangeCards() {
 		BufferedReader br = StartGame.br;
 		String input =null;
@@ -95,7 +117,12 @@ public class CardExchangeView implements Observer {
 		}
 
 	}
-
+	
+	
+	/**
+	* This method is used to remove card from the player
+	* @param typeOfCardMapping map object of mapping of cards
+	*/
 	private void removePlayerCards(Map<String,Integer> typeOfCardMapping) {
 		Queue<Card> cardToRemove = new LinkedList<>();
 		Iterator<Card> ite = cardViewModel.getCardOfCurrentPlayer(curPlayer).iterator();
@@ -115,6 +142,12 @@ public class CardExchangeView implements Observer {
 		cardViewModel.getAllCards().addAll(cardToRemove);
 	}
 	
+	
+	/**
+	* This method is used to form a map from the input string
+	* @param inout input string
+	* @return Map return the hasmap object
+	*/
 	private Map<String,Integer> formMappingFromInput(String input){
 		String [] arr = input.split(" ");
 		Map<String,Integer> mapping = new HashMap<String, Integer>();
@@ -125,6 +158,14 @@ public class CardExchangeView implements Observer {
 		
 	}
 	
+	
+	/**
+	* This method is used to check if card exchange is possible or not
+	* @param card1 value of card1
+	* @param card2 value of card2
+	* @param card3 value of card3
+	* @return boolean true if exchange is possible else false
+	*/
 	private boolean ifExchangePossible(int card1, int card2, int card3) {
 		if(card1 ==1 && card2==1 && card3==1) {
 			return true;
@@ -135,7 +176,13 @@ public class CardExchangeView implements Observer {
 		}
 		
 	}
+		
 	
+	/**
+	* This method is used to validate card exchange command
+	* @param input input card exchange command
+	* @return boolean true if command is valid else false
+	*/
 	private boolean validateCardExchangeCommand(String input) {
 		String[] arr = input.split(" ");
 		if (!arr[0].equalsIgnoreCase("exchangecards")) {

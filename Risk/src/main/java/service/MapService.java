@@ -52,6 +52,7 @@ public class MapService {
 	* This method is used to read the map file
 	* and add continents, countries and neighbors of the countries
 	* @param filePath path of the file that going to be read
+	* @exception IOException if data from file cannot be readable to or closed. 
 	*/
 	public void readFile(String filePath) throws IOException {
 

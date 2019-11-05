@@ -4,9 +4,19 @@ import java.util.Observable;
 import java.util.Observer;
 
 import model.PhaseViewModel;
-
+/**
+* This PhaseView file can contains the observer method
+* of the risk game.
+* @author  Yash
+* @version 1.2
+*/
 public class PhaseView implements Observer {
-
+	
+	/**
+	* This method is used to update the observers of the phase
+	* @param o phase view observable object
+	* @param arg phase view observable object
+	*/
 	@Override
 	public void update(Observable o, Object arg) {
 		PhaseViewModel model = (PhaseViewModel) o;

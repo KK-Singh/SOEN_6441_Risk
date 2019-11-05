@@ -9,9 +9,20 @@ import java.util.Set;
 import model.Continent;
 import model.Player;
 import model.WorldDominationViewModel;
-
+/**
+* This PhaseView file can contains the observer method
+* of the risk game.
+* @author  Yash
+* @version 1.2
+*/
 public class WorldDominationView implements Observer{
-
+	
+	
+	/**
+	* This method is used to update the observers of the Dominationview
+	* @param o Domination view observable object
+	* @param arg Domination view observable object
+	*/
 	@Override
 	public void update(Observable o, Object arg) {
 		WorldDominationViewModel model = (WorldDominationViewModel)o;
