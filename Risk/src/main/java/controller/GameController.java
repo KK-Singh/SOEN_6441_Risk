@@ -16,6 +16,11 @@ import view.CardExchangeView;
 import view.PhaseView;
 import view.WorldDominationView;
 
+/**
+ * GameController class implements the methods of the game
+ * 
+ * @author Pegah
+ */
 public class GameController {
 
 	GameService gameService = new GameService();
@@ -31,7 +36,12 @@ public class GameController {
 	WorldDominationViewModel worldDominationModel;
 
 	CardViewModel cardViewModel;
-
+/**
+ * This method is used to start the game
+ * @param players : this is a list of players
+ * @param continentMap : this is the map of continent
+ * @param countryMap : this is the map of country
+ */
 	public void startGame(List<Player> players, Map<Integer, Continent> continentMap,
 			Map<Integer, Country> countryMap) {
 
@@ -51,7 +61,14 @@ public class GameController {
 		cardViewModel = new CardViewModel();
 		cardViewModel.addObserver(new CardExchangeView());
 	}
-
+	/**
+	 * This method is used for the startUpPhase of the game
+	 * @param players : this is a list of players
+	 * @param playerTurnp  : this is player turn
+	 * @param allPlaced : this is allPlaced for armies
+	 * @param countryName : this is country name
+	 * @param armyCount : this is the number of armies
+	 */
 	public void startUpPhase(List<Player> players, int playerTurn, boolean allPlaced, String countryName,
 			int armyCount) {
 		phaseViewModel.setCurrentPhase("Startup Phase ::::");
@@ -83,7 +100,14 @@ public class GameController {
 			gameService.fillPlayerCountry(players.get(playerTurn), countryName, armyCount);
 		}
 	}
-
+	
+	/**
+	 * This method is used for fortification of armies
+	 * @param Player player : this is Player object
+	 * @param startCountry : this is the starting country
+	 * @param destinationCountry : this is the destination country
+	 * @param armyToMove : this is the number of armies to move
+	 */
 	public void fortify(Player player, String startCountry, String destinationCountry, int armyToMove) {
 		
 		phaseViewModel.setCurrentPhase("Fortification Phase ::");
@@ -96,7 +120,13 @@ public class GameController {
 				MapService.getObject().getCountry(destinationCountry.trim()), armyToMove);
 
 	}
-	
+	/**
+	 * This method is used for moving armies after attack phase
+	 * @param Player player : this is Playar object
+	 * @param startCountry : this is the starting country
+	 * @param destinationCountry : this is the destination country
+	 * @param armyToMove : this is the number of armies to move
+	 */
 	public void moveArmyAfterAttack(Player player, String startCountry, String destinationCountry, int armyToMove) {
 		
 		phaseViewModel.setCurrentPhaseInfo("Player "+ player.getPlayerName() + " will move from "+ startCountry + " to "+ destinationCountry +" "+ armyToMove+" armies");
@@ -107,14 +137,25 @@ public class GameController {
 				MapService.getObject().getCountry(destinationCountry.trim()), armyToMove);
 
 	}
-
+	/**
+	 *  This method is used for validation of Fortification
+	 * @param startCountry : this is the starting country
+	 * @param destinationCountry : this is the destination country
+	 * @param armyToMove : this is the number of armies to move
+	 * @return gameService object
+	 */
 	public List<String> validateFortification(String startCountry, String destinationCountry, int armyToMove) {
 
 		return gameService.validateFortification(MapService.getObject().getCountry(startCountry),
 				MapService.getObject().getCountry(destinationCountry), armyToMove);
 
 	}
-
+	/**
+	 * This method is used for Reinforcement phase 
+	 * @param Player player : this is Playar object
+	 * @param countryName : this is country name
+	 * @param armyCount : this is the number of armies
+	 */
 	public void reinforcementPhase(Player player, String countryName, int armyCount) {
 		
 		phaseViewModel.setCurrentPhase("Reinforcement Phase::");
@@ -126,23 +167,38 @@ public class GameController {
 		Country reinforcementCountry = MapService.getObject().getCountry(countryName);
 		player.reinforcementPhase(reinforcementCountry, armyCount);
 	}
-
+	/**
+	 * This method is used for setting armies for players
+	 * @param players : this is a list of Players
+	 */
 	public void setArmyCountForPlayer(List<Player> players) {
-
 		int armyCount = gameService.getArmyCountBasedOnPlayers(players);
 		players.forEach(player -> {
 			player.setArmy(armyCount);
 		});
 	}
-
+	/**
+	 * This method is used for loading map into the console
+	 * @param players : this is a list of Players
+	 */
 	public void loadMapOnConsole(List<Player> players) {
 		gameService.loadMapOnConsole(players);
 	}
-
+	/**
+	 * This method is used for reinforcements of armies
+	 * @param Player player : this is Player object
+	 */
 	public void reinforcementArmy(Player player) {
 		gameService.reinforcementArmy(player);
 	}
-
+	/**
+	 * This method is used for validation of selected numbers of dices
+	 * @param attackerCountryName : this is the name of country for attacker
+	 * @param defenderCountryName : this is the name of country for defender
+	 * @param attackerTotalDice : this is the total number of dice for attacker
+	 * @param defenderTotalDice : this is the total number of dice for defender
+	 * @return gameService object
+	 */
 	public String validateSelectedNumberOfDice(String attackerCountryName, String defenderCountryName,
 			String attackerTotalDice, String defenderTotalDice) {
 		Country attackerCountry = MapService.getObject().getCountry(attackerCountryName);
@@ -151,7 +207,16 @@ public class GameController {
 		return gameService.validateSelectedNumberOfDice(attackerCountry, defenderCountry, attackerTotalDice,
 				defenderTotalDice);
 	}
-
+	/**
+	 * This method is used for Attack phase
+	 * @param Player attacker : this is an object of Player for attacker
+	 * @param attackerCountryName : this is the name of country for attacker
+	 * @param defenderCountryName : this is the name of country for defender
+	 * @param ifAllOut : this is checked all armies out 
+	 * @param totalAttackerDice : this is the total number of dice for attacker
+	 * @param totalDefenderDice : this is the total number of dice for defender
+	 * @return resultMap
+	 */
 	public Pair<Boolean, Integer> attack(Player attacker,String attackerCountryName, String defenderCountryName, boolean ifAllOut,
 			int totalAttackerDice, int totalDefenderDice) {
 		Country attackerCountry = MapService.getObject().getCountry(attackerCountryName);
@@ -176,7 +241,10 @@ public class GameController {
 		return resultMap;
 
 	}
-
+	/**
+	 * This method is used for finishing the atack 
+	 * @param Player curPlayer : this is Player object
+	 */
 	public void finishAttack(Player curPlayer) {
 		if (cardViewModel.getIfPlayerWonCard()) {
 			if (cardViewModel.getAllCards().size() != 0) {
@@ -187,6 +255,10 @@ public class GameController {
 		}
 		cardViewModel.setIfPlayerWonCard(false);
 	}
+	/**
+	 * This method is used for calculation of cards
+	 * @param Player curPlayer : this is Player object
+	 */
 
 	public void callCardExchangeView(Player curPlayer) {
 		cardViewModel.setCurrentPlayerView(curPlayer);
