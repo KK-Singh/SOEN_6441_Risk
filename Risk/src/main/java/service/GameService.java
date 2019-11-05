@@ -3,18 +3,26 @@ package service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
+import javafx.util.Pair;
 import model.Continent;
 import model.Country;
+import model.PhaseViewModel;
 import model.Player;
-
+/**
+ * 
+ * @author Pegah
+ *
+ */
 public class GameService {
 
 	public void loadMapOnConsole(List<Player> players) {
@@ -22,12 +30,12 @@ public class GameService {
 		players.forEach(player -> {
 			System.out.println("Player Name " + " : " + player.getPlayerName());
 			System.out.println("Army Count " + " : " + player.getArmy());
-			System.out.println("Total Countries : " + " : " + player.getAlloccupied_countries().size());
+			System.out.println("Total Countries : " + " : " + player.getPlayerCountries().size());
 			System.out.println("Countries ");
-			player.getAlloccupied_countries().forEach(country -> {
-				System.out.print("Country Name : " + country.getName() + " : " + country.getNo_of_armies());
+			player.getPlayerCountries().forEach(country -> {
+				System.out.print("Country Name : " + country.getName() + " : " + country.getArmyCount());
 				country.getNeighbors().forEach(nc -> {
-					if (!nc.getOwner_player().getPlayerName().equalsIgnoreCase(player.getPlayerName())) {
+					if (!nc.getCountryOwner().getPlayerName().equalsIgnoreCase(player.getPlayerName())) {
 						System.out.print(" Neighbour Country : " + nc.getName() + " ");
 					}
 				});
@@ -73,12 +81,12 @@ public class GameService {
 
 			Country country = countryMap.get(index);
 			Player player = players.get(count);
-			List<Country> playerCountries = player.getAlloccupied_countries();
-			country.setNo_of_armies(1);
+			List<Country> playerCountries = player.getPlayerCountries();
+			country.setArmyCount(1);
 			player.setArmy(player.getArmy() - 1);
 			playerCountries.add(country);
-			country.setOwner_player(player);
-			player.setAlloccupied_countries(playerCountries);
+			country.setCountryOwner(player);
+			player.setPlayerCountries(playerCountries);
 			count++;
 			countryMap.remove(index);
 
@@ -112,7 +120,7 @@ public class GameService {
 	}
 
 	public void reinforcementArmy(Player player) {
-		int totalCountries = player.getAlloccupied_countries().size();
+		int totalCountries = player.getPlayerCountries().size();
 		int totalArmy = 0;
 
 		if (totalCountries < 9) {
@@ -123,7 +131,7 @@ public class GameService {
 
 		Set<Continent> visitedContinent = new HashSet<>();
 
-		List<Country> countries = player.getAlloccupied_countries();
+		List<Country> countries = player.getPlayerCountries();
 
 		for (int i = 0; i < countries.size(); i++) {
 
@@ -138,9 +146,9 @@ public class GameService {
 	}
 
 	public void fillPlayerCountry(Player player, String countryName, int armyCount) {
-		player.getAlloccupied_countries().forEach(country -> {
+		player.getPlayerCountries().forEach(country -> {
 			if (country.getName().equalsIgnoreCase(countryName)) {
-				country.setNo_of_armies(country.getNo_of_armies() + armyCount);
+				country.setArmyCount(country.getArmyCount() + armyCount);
 				player.setArmy(player.getArmy() - armyCount);
 			}
 
@@ -149,7 +157,7 @@ public class GameService {
 	}
 
 	public String fortifyPosition(Country startCountry, Country destinationCountry, int armyToMove) {
-		int startArmy = startCountry.getNo_of_armies();
+		int startArmy = startCountry.getArmyCount();
 
 		if (startArmy <= 1 || (startArmy - armyToMove) < 1) {
 			return "Cannot move army from the Country";
@@ -157,26 +165,37 @@ public class GameService {
 
 			List<Country> fortifiableCountries = getFortifiableCountries(startCountry);
 			if (fortifiableCountries.contains(destinationCountry)) {
-				destinationCountry.setNo_of_armies(destinationCountry.getNo_of_armies() + armyToMove);
-				destinationCountry.setNo_of_armies(startArmy - armyToMove);
+				destinationCountry.setArmyCount(destinationCountry.getArmyCount() + armyToMove);
+				startCountry.setArmyCount(startArmy - armyToMove);
 				return "Army Moved";
 			} else {
 				return "Cannot move army from the Country";
 			}
 		}
 	}
+	
+	public List<String> validateFortification(Country fromCountry, Country toCountry,int armyToMove){
+		int startArmy = fromCountry.getArmyCount();
+		List<Country> fortifiableCountries = getFortifiableCountries(fromCountry);
+		List<String> result = new ArrayList<>();
+		if(startArmy<=1 || (startArmy-armyToMove)<1) {
+			result.add("Cannot move army from the Country");
+		}
+		
 
-	/**
-	 * This method will return a list of territories can be fortified by a given
-	 * territory.
-	 *
-	 * @param territory: territory for which fortifiable territories needs to be
-	 *                   found.
-	 * @return List: a list of all the territories on which given territory can
-	 *         fortify.
-	 */
+		if(!fortifiableCountries.contains(toCountry))
+		{
+			result.add("Fortifiable countries for the given country are : ");
+			fortifiableCountries.forEach(c->{
+				result.add(c.getName());
+			});
+		}	
+		
+		return result;
+	} 
+
 	public List<Country> getFortifiableCountries(Country territory) {
-		Player player = territory.getOwner_player();
+		Player player = territory.getCountryOwner();
 		List<Country> fortifiableTerritories = new ArrayList<>();
 
 		Queue<Country> queue = new LinkedList<>();
@@ -187,7 +206,7 @@ public class GameService {
 		while (queue.size() > 0) {
 			t = queue.poll();
 			for (Country neighbours : t.getNeighbors()) {
-				if (neighbours.getOwner_player() == player && !fortifiableTerritories.contains(neighbours)) {
+				if (neighbours.getCountryOwner() == player && !fortifiableTerritories.contains(neighbours)) {
 					fortifiableTerritories.add(neighbours);
 					queue.add(neighbours);
 				}
@@ -198,39 +217,46 @@ public class GameService {
 		return fortifiableTerritories;
 	}
 
-	private boolean ifPathExists(Country startCountry, Country endCountry) {
-		Queue<Country> nextToVisit = new LinkedList<Country>();
-		Set<Country> visited = new HashSet<>();
-		nextToVisit.add(startCountry);
-		while (!nextToVisit.isEmpty()) {
-			Country country = nextToVisit.remove();
-			String playerName = country.getOwner_player().getPlayerName();
-			if (country.equals(endCountry)) {
-				return true;
-			}
-			if (visited.contains(country))
-				continue;
-			visited.add(country);
-
-			country.getNeighbors().forEach(nc -> {
-				if (nc.getOwner_player().getPlayerName().equalsIgnoreCase(playerName))
-					nextToVisit.add(nc);
-			});
-		}
-
-		return false;
-	}
-
 	public boolean ifContinetOwned(Continent continent, Player player) {
-		List<Country> countries = player.getAlloccupied_countries();
+		List<Country> countries = player.getPlayerCountries();
 		List<Country> countriesInContinent = continent.getCountries();
 
 		for (int i = 0; i < countriesInContinent.size(); i++) {
-			if (!countries.contains(countriesInContinent.get(0))) {
+			if (!countries.contains(countriesInContinent.get(i))) {
 				return false;
 			}
 		}
 		return true;
+	}
+
+	public boolean ifGameEnded(Player player, int totalCountries) {
+		if(player.getPlayerCountries().size()==totalCountries)
+			return true;
+		return false;
+	}
+	
+	public String validateSelectedNumberOfDice(Country attackerCountry, Country defenderCountry, String attackerTotalDice, String defenderTotalDice) {
+		int totalAttackerDice, totalDefenderDice;
+		
+		try {
+			totalAttackerDice = Integer.parseInt(attackerTotalDice);
+			totalDefenderDice = Integer.parseInt(defenderTotalDice);
+		}catch(NumberFormatException e) {
+			return "Enter Valid Number for Attacker and Defender";
+		}
+		
+		
+		if(totalAttackerDice>3 || totalAttackerDice<1 || totalAttackerDice> attackerCountry.getArmyCount()-1) {
+			return "Selected attacker can roll min 1 and max "
+					+(3>attackerCountry.getArmyCount()-1 ? attackerCountry.getArmyCount()-1 : 3);
+		}
+		
+		if(totalDefenderDice>2 || totalDefenderDice<1 || totalDefenderDice>defenderCountry.getArmyCount()) {
+			return "Selected defender can roll min 1 and max "
+					+(2>defenderCountry.getArmyCount() ? defenderCountry.getArmyCount(): 2);
+		}
+		
+		return "ValidChoice";
 	}
 
 }
