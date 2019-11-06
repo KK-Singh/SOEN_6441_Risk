@@ -162,7 +162,7 @@ public class GameService {
 	*/
 	public void reinforcementArmy(Player player) {
 		int totalCountries = player.getPlayerCountries().size();
-		int totalArmy = 0;
+		int totalArmy = player.getArmy();
 
 		if (totalCountries < 9) {
 			totalArmy += 3;
@@ -202,33 +202,6 @@ public class GameService {
 
 		});
 
-	}
-
-	
-	/**
-	* This is method is used to fortify the army from
-	* one country to another
-	* @param startCountry a single country object of source/start country
-	* @param destinationCountry a single country object of destination country
-	* @param armyToMove number of armies
-	* @return String a print/output statement
-	*/
-	public String fortifyPosition(Country startCountry, Country destinationCountry, int armyToMove) {
-		int startArmy = startCountry.getArmyCount();
-
-		if (startArmy <= 1 || (startArmy - armyToMove) < 1) {
-			return "Cannot move army from the Country";
-		} else {
-
-			List<Country> fortifiableCountries = getFortifiableCountries(startCountry);
-			if (fortifiableCountries.contains(destinationCountry)) {
-				destinationCountry.setArmyCount(destinationCountry.getArmyCount() + armyToMove);
-				startCountry.setArmyCount(startArmy - armyToMove);
-				return "Army Moved";
-			} else {
-				return "Cannot move army from the Country";
-			}
-		}
 	}
 	
 	

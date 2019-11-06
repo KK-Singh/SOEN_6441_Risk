@@ -340,13 +340,12 @@ public class StartGame {
 		return answer;
 	}
 	
-/**
- * This method is helping in creating of map 
- * @param br : buffer reader 
- * @param input : String after parsing the command
- * @param stargameObj : GameObject upon which map command would be executed
- * 
- */
+	/**
+	 * This method is helping in creating of map 
+	 * @param br : buffer reader 
+	 * @param input : String after parsing the command
+	 * @param stargameObj: GameObject upon which map command would be executed
+	 */
 	public void createMapHelper(BufferedReader br, String input, StartGame startGameObj) throws IOException {
 		List<String> possibleValues = new ArrayList<String>();
 		possibleValues.add("editcontinent");
@@ -505,7 +504,7 @@ public class StartGame {
 	/**
 	 * It is used to validate load map command
 	 * @param input :load map command
-	 * @return
+	 * @return String :command after validation
 	 */
 	private String validateLoadMapCommands(String input) {
 		String[] arr = input.split(" ");
@@ -520,7 +519,7 @@ public class StartGame {
 	 * It is used to validate map editor command
 	 * @param input :map editor command 
 	 * @param possibleValues : list of map editor command
-	 * @return : boolean whether map editor command it correct!
+	 * @return boolean whether map editor command it correct!
 	 */
 	private boolean validateMapEditorCommands(String input, List<String> possibleValues) {
 
