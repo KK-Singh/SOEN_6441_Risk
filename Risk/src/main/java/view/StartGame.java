@@ -82,15 +82,17 @@ public class StartGame {
 			try {
 				if (filePath != null) {
 					String answer = startGameObj.loadMap(filePath);
-					if (answer.startsWith("File"))
+					boolean isValid = startGameObj.mapController.validateMap();
+					
+					if (answer.startsWith("File") && isValid )
 						break;
-//					else
-//						System.out.println("Enter Valid Load Map Command");
+					else
+						System.out.println("Enter Valid Map file");
 				} else {
 					System.out.println("Enter Valid Load Map Command");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				System.out.println("Enter Valid Load Map Command");
 			}
 		}
@@ -333,7 +335,8 @@ public class StartGame {
 
 	public String loadMap(String filePath) {
 		String answer = mapController.readFile(filePath);
-		if (answer.startsWith("File")) {
+		
+		if (answer.startsWith("File") ) {
 			System.out.println("Entered Map is ::: ");
 			mapController.showMap();
 		}
