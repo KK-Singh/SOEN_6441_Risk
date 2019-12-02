@@ -12,9 +12,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import ControllerHelper.MapVerification;
 import model.Continent;
 import model.Country;
-import service.MapVerification;
 
 /**
  * @author Pegah

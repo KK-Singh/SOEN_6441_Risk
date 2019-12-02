@@ -1,17 +1,25 @@
 package controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import ControllerHelper.GameControllerHelper;
+import ControllerHelper.MapControllerHelper;
 import javafx.util.Pair;
 import model.CardViewModel;
 import model.Continent;
 import model.Country;
+import model.GameObject;
 import model.PhaseViewModel;
 import model.Player;
+import model.StrategyEnum;
+import model.StrategyInterface;
 import model.WorldDominationViewModel;
-import service.GameService;
-import service.MapService;
 import view.CardExchangeView;
 import view.PhaseView;
 import view.WorldDominationView;
@@ -23,7 +31,7 @@ import view.WorldDominationView;
  */
 public class GameController {
 
-	GameService gameService = new GameService();
+	GameControllerHelper gameService = new GameControllerHelper();
 
 	Map<Integer, Continent> continentMap;
 
@@ -36,12 +44,23 @@ public class GameController {
 	WorldDominationViewModel worldDominationModel;
 
 	CardViewModel cardViewModel;
-/**
- * This method is used to start the game
- * @param players : this is a list of players
- * @param continentMap : this is the map of continent
- * @param countryMap : this is the map of country
- */
+
+	Map<String, List<String>> tournamentModeResult;
+
+	String statOfTorunament = null;
+
+	MapControllerHelper mapService = MapControllerHelper.getObject();
+
+	/**
+	 * This method is used to start the game
+	 * 
+	 * @param players
+	 *            : this is a list of players
+	 * @param continentMap
+	 *            : this is the map of continent
+	 * @param countryMap
+	 *            : this is the map of country
+	 */
 	public void startGame(List<Player> players, Map<Integer, Continent> continentMap,
 			Map<Integer, Country> countryMap) {
 
@@ -61,13 +80,20 @@ public class GameController {
 		cardViewModel = new CardViewModel();
 		cardViewModel.addObserver(new CardExchangeView());
 	}
+
 	/**
 	 * This method is used for the startUpPhase of the game
-	 * @param players : this is a list of players
-	 * @param playerTurnp  : this is player turn
-	 * @param allPlaced : this is allPlaced for armies
-	 * @param countryName : this is country name
-	 * @param armyCount : this is the number of armies
+	 * 
+	 * @param players
+	 *            : this is a list of players
+	 * @param playerTurnp
+	 *            : this is player turn
+	 * @param allPlaced
+	 *            : this is allPlaced for armies
+	 * @param countryName
+	 *            : this is country name
+	 * @param armyCount
+	 *            : this is the number of armies
 	 */
 	public void startUpPhase(List<Player> players, int playerTurn, boolean allPlaced, String countryName,
 			int armyCount) {
@@ -79,7 +105,7 @@ public class GameController {
 					"Player " + players.get(playerTurn).getPlayerName() + " will place all amries at once");
 			phaseViewModel.allChanged();
 			worldDominationModel.stateUpdate(continentMap, countryMap);
-			
+
 			Player player = players.get(playerTurn);
 			int index = 0;
 			List<Country> playerCountries = player.getPlayerCountries();
@@ -100,76 +126,103 @@ public class GameController {
 			gameService.fillPlayerCountry(players.get(playerTurn), countryName, armyCount);
 		}
 	}
-	
+
 	/**
 	 * This method is used for fortification of armies
-	 * @param Player player : this is Player object
-	 * @param startCountry : this is the starting country
-	 * @param destinationCountry : this is the destination country
-	 * @param armyToMove : this is the number of armies to move
+	 * 
+	 * @param Player
+	 *            player : this is Player object
+	 * @param startCountry
+	 *            : this is the starting country
+	 * @param destinationCountry
+	 *            : this is the destination country
+	 * @param armyToMove
+	 *            : this is the number of armies to move
 	 */
 	public void fortify(Player player, String startCountry, String destinationCountry, int armyToMove) {
-		
+
 		phaseViewModel.setCurrentPhase("Fortification Phase ::");
-		phaseViewModel.setCurrentPhaseInfo("Player "+ player.getPlayerName() + " will fortify from "+ startCountry + " to "+ destinationCountry +" "+ armyToMove+" armies");
+		phaseViewModel.setCurrentPhaseInfo("Player " + player.getPlayerName() + " will fortify from " + startCountry
+				+ " to " + destinationCountry + " " + armyToMove + " armies");
 		phaseViewModel.setCurrentPlayer(player.getPlayerName());
 		phaseViewModel.allChanged();
 		worldDominationModel.stateUpdate(continentMap, countryMap);
-		if(startCountry!=null)
-		player.fortify(MapService.getObject().getCountry(startCountry.trim()),
-				MapService.getObject().getCountry(destinationCountry.trim()), armyToMove);
+		if (startCountry != null)
+			player.fortify(MapControllerHelper.getObject().getCountry(startCountry.trim()),
+					MapControllerHelper.getObject().getCountry(destinationCountry.trim()), armyToMove, phaseViewModel);
 
 	}
+
 	/**
 	 * This method is used for moving armies after attack phase
-	 * @param Player player : this is Playar object
-	 * @param startCountry : this is the starting country
-	 * @param destinationCountry : this is the destination country
-	 * @param armyToMove : this is the number of armies to move
+	 * 
+	 * @param Player
+	 *            player : this is Playar object
+	 * @param startCountry
+	 *            : this is the starting country
+	 * @param destinationCountry
+	 *            : this is the destination country
+	 * @param armyToMove
+	 *            : this is the number of armies to move
 	 */
 	public void moveArmyAfterAttack(Player player, String startCountry, String destinationCountry, int armyToMove) {
-		
-		phaseViewModel.setCurrentPhaseInfo("Player "+ player.getPlayerName() + " will move from "+ startCountry + " to "+ destinationCountry +" "+ armyToMove+" armies");
+
+		phaseViewModel.setCurrentPhaseInfo("Player " + player.getPlayerName() + " will move from " + startCountry
+				+ " to " + destinationCountry + " " + armyToMove + " armies");
 		phaseViewModel.allChanged();
 		worldDominationModel.stateUpdate(continentMap, countryMap);
-		
-		player.fortify(MapService.getObject().getCountry(startCountry.trim()),
-				MapService.getObject().getCountry(destinationCountry.trim()), armyToMove);
+
+		player.fortify(MapControllerHelper.getObject().getCountry(startCountry.trim()),
+				MapControllerHelper.getObject().getCountry(destinationCountry.trim()), armyToMove, phaseViewModel);
 
 	}
+
 	/**
-	 *  This method is used for validation of Fortification
-	 * @param startCountry : this is the starting country
-	 * @param destinationCountry : this is the destination country
-	 * @param armyToMove : this is the number of armies to move
+	 * This method is used for validation of Fortification
+	 * 
+	 * @param startCountry
+	 *            : this is the starting country
+	 * @param destinationCountry
+	 *            : this is the destination country
+	 * @param armyToMove
+	 *            : this is the number of armies to move
 	 * @return gameService object
 	 */
 	public List<String> validateFortification(String startCountry, String destinationCountry, int armyToMove) {
 
-		return gameService.validateFortification(MapService.getObject().getCountry(startCountry),
-				MapService.getObject().getCountry(destinationCountry), armyToMove);
+		return gameService.validateFortification(MapControllerHelper.getObject().getCountry(startCountry),
+				MapControllerHelper.getObject().getCountry(destinationCountry), armyToMove);
 
 	}
+
 	/**
-	 * This method is used for Reinforcement phase 
-	 * @param Player player : this is Playar object
-	 * @param countryName : this is country name
-	 * @param armyCount : this is the number of armies
+	 * This method is used for Reinforcement phase
+	 * 
+	 * @param Player
+	 *            player : this is Playar object
+	 * @param countryName
+	 *            : this is country name
+	 * @param armyCount
+	 *            : this is the number of armies
 	 */
 	public void reinforcementPhase(Player player, String countryName, int armyCount) {
-		
+
 		phaseViewModel.setCurrentPhase("Reinforcement Phase::");
-		phaseViewModel.setCurrentPhaseInfo("Player "+ player.getPlayerName() + " will reinforce "+ countryName + " with "+ armyCount+ " armies");
+		phaseViewModel.setCurrentPhaseInfo("Player " + player.getPlayerName() + " will reinforce " + countryName
+				+ " with " + armyCount + " armies");
 		phaseViewModel.setCurrentPlayer(player.getPlayerName());
 		phaseViewModel.allChanged();
 		worldDominationModel.stateUpdate(continentMap, countryMap);
-		
-		Country reinforcementCountry = MapService.getObject().getCountry(countryName);
-		player.reinforcementPhase(reinforcementCountry, armyCount);
+
+		Country reinforcementCountry = MapControllerHelper.getObject().getCountry(countryName);
+		player.reinforcementPhase(reinforcementCountry, armyCount, phaseViewModel);
 	}
+
 	/**
 	 * This method is used for setting armies for players
-	 * @param players : this is a list of Players
+	 * 
+	 * @param players
+	 *            : this is a list of Players
 	 */
 	public void setArmyCountForPlayer(List<Player> players) {
 		int armyCount = gameService.getArmyCountBasedOnPlayers(players);
@@ -177,58 +230,79 @@ public class GameController {
 			player.setArmy(armyCount);
 		});
 	}
+
 	/**
 	 * This method is used for loading map into the console
-	 * @param players : this is a list of Players
+	 * 
+	 * @param players
+	 *            : this is a list of Players
 	 */
 	public void loadMapOnConsole(List<Player> players) {
 		gameService.loadMapOnConsole(players);
 	}
+
 	/**
 	 * This method is used for reinforcements of armies
-	 * @param Player player : this is Player object
+	 * 
+	 * @param Player
+	 *            player : this is Player object
 	 */
 	public void reinforcementArmy(Player player) {
 		gameService.reinforcementArmy(player);
 	}
+
 	/**
 	 * This method is used for validation of selected numbers of dices
-	 * @param attackerCountryName : this is the name of country for attacker
-	 * @param defenderCountryName : this is the name of country for defender
-	 * @param attackerTotalDice : this is the total number of dice for attacker
-	 * @param defenderTotalDice : this is the total number of dice for defender
+	 * 
+	 * @param attackerCountryName
+	 *            : this is the name of country for attacker
+	 * @param defenderCountryName
+	 *            : this is the name of country for defender
+	 * @param attackerTotalDice
+	 *            : this is the total number of dice for attacker
+	 * @param defenderTotalDice
+	 *            : this is the total number of dice for defender
 	 * @return gameService object
 	 */
 	public String validateSelectedNumberOfDice(String attackerCountryName, String defenderCountryName,
 			String attackerTotalDice, String defenderTotalDice) {
-		Country attackerCountry = MapService.getObject().getCountry(attackerCountryName);
-		Country defenderCountry = MapService.getObject().getCountry(defenderCountryName);
+		Country attackerCountry = MapControllerHelper.getObject().getCountry(attackerCountryName);
+		Country defenderCountry = MapControllerHelper.getObject().getCountry(defenderCountryName);
 
 		return gameService.validateSelectedNumberOfDice(attackerCountry, defenderCountry, attackerTotalDice,
 				defenderTotalDice);
 	}
+
 	/**
 	 * This method is used for Attack phase
-	 * @param Player attacker : this is an object of Player for attacker
-	 * @param attackerCountryName : this is the name of country for attacker
-	 * @param defenderCountryName : this is the name of country for defender
-	 * @param ifAllOut : this is checked all armies out 
-	 * @param totalAttackerDice : this is the total number of dice for attacker
-	 * @param totalDefenderDice : this is the total number of dice for defender
+	 * 
+	 * @param Player
+	 *            attacker : this is an object of Player for attacker
+	 * @param attackerCountryName
+	 *            : this is the name of country for attacker
+	 * @param defenderCountryName
+	 *            : this is the name of country for defender
+	 * @param ifAllOut
+	 *            : this is checked all armies out
+	 * @param totalAttackerDice
+	 *            : this is the total number of dice for attacker
+	 * @param totalDefenderDice
+	 *            : this is the total number of dice for defender
 	 * @return resultMap
 	 */
-	public Pair<Boolean, Integer> attack(Player attacker,String attackerCountryName, String defenderCountryName, boolean ifAllOut,
-			int totalAttackerDice, int totalDefenderDice) {
-		Country attackerCountry = MapService.getObject().getCountry(attackerCountryName);
-		Country defenderCountry = MapService.getObject().getCountry(defenderCountryName);
+	public Pair<Boolean, Integer> attack(Player attacker, String attackerCountryName, String defenderCountryName,
+			boolean ifAllOut, int totalAttackerDice, int totalDefenderDice) {
+		Country attackerCountry = MapControllerHelper.getObject().getCountry(attackerCountryName);
+		Country defenderCountry = MapControllerHelper.getObject().getCountry(defenderCountryName);
 		Player defender = defenderCountry.getCountryOwner();
-		
+
 		phaseViewModel.setCurrentPhase("Attack Phase");
 		phaseViewModel.setCurrentPlayer(attacker.getPlayerName());
-		phaseViewModel.setCurrentPhaseInfo("Player "+ attacker.getPlayerName()+ " will try attack from "+ attackerCountryName +" to "+ defenderCountryName);
+		phaseViewModel.setCurrentPhaseInfo("Player " + attacker.getPlayerName() + " will try attack from "
+				+ attackerCountryName + " to " + defenderCountryName);
 		Pair<Boolean, Integer> resultMap = attacker.attack(attackerCountry, defenderCountry, defender, ifAllOut,
 				totalAttackerDice, totalDefenderDice, phaseViewModel);
-		
+
 		if (!cardViewModel.getIfPlayerWonCard() && resultMap.getKey()) {
 			cardViewModel.setIfPlayerWonCard(resultMap.getKey());
 		}
@@ -241,9 +315,12 @@ public class GameController {
 		return resultMap;
 
 	}
+
 	/**
-	 * This method is used for finishing the atack 
-	 * @param Player curPlayer : this is Player object
+	 * This method is used for finishing the atack
+	 * 
+	 * @param Player
+	 *            curPlayer : this is Player object
 	 */
 	public void finishAttack(Player curPlayer) {
 		if (cardViewModel.getIfPlayerWonCard()) {
@@ -255,13 +332,274 @@ public class GameController {
 		}
 		cardViewModel.setIfPlayerWonCard(false);
 	}
+
 	/**
 	 * This method is used for calculation of cards
-	 * @param Player curPlayer : this is Player object
+	 * 
+	 * @param Player
+	 *            curPlayer : this is Player object
 	 */
 
 	public void callCardExchangeView(Player curPlayer) {
 		cardViewModel.setCurrentPlayerView(curPlayer);
 	}
 
+	public void playTournament(List<String> allFiles, Map<Player, StrategyEnum> playerStrategyMap, int numberOfGames,
+			int maxTurns, boolean ifTournament) throws IOException, InterruptedException {
+
+		int result = gameService.validatePlayerStrategyMappingForTournament(playerStrategyMap);
+
+		if (result == -1 || result == -2) {
+			phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo()
+					+ "\n cannot player tournamnet either you've entered a human stratgey for it or there is no strategy for a player");
+			phaseViewModel.allChanged();
+			return;
+		} else {
+			for (Player curPlayer : playersList) {
+				StrategyInterface si = gameService.getPlayerStrategy(playerStrategyMap, curPlayer);
+				if (si == null) {
+					return;
+				} else {
+					curPlayer.setPlayerStrategy(si);
+				}
+			}
+		}
+
+		tournamentModeResult = new HashMap<>();
+
+		for (int i = 0; i < numberOfGames; i++) {
+			for (int j = 0; j < allFiles.size(); j++) {
+				int movesToDraw = maxTurns;
+
+				String filePath = allFiles.get(j);
+				mapService.readFile(filePath);
+				startGame(playersList, continentMap, countryMap);
+				startUpForNonHumanHelper();
+
+				outer: while (movesToDraw != 0) {
+					for (Player curPlayer : playersList) {
+						reinforcementForNonHuman(curPlayer);
+						Thread.sleep(1000);
+						if (attackForNonHuman(curPlayer, playerStrategyMap, filePath)) {
+							break outer;
+						}
+						Thread.sleep(1000);
+						fortificationForNonHuman(curPlayer);
+						movesToDraw--;
+					}
+				}
+				if (movesToDraw == 0) {
+					statOfTorunament = "Draw";
+					List<String> result2 = new ArrayList<>();
+					if (tournamentModeResult.get(filePath) != null) {
+						result2 = tournamentModeResult.get(filePath);
+						result2.add(statOfTorunament);
+						tournamentModeResult.put(filePath, result2);
+					} else {
+						result2.add(filePath);
+						tournamentModeResult.put(filePath, result2);
+					}
+				}
+			}
+		}
+		if (ifTournament) {
+			System.out.println("M : ");
+			for (int i = 0; i < allFiles.size(); i++) {
+				if (i == allFiles.size() - 1) {
+					System.out.print(allFiles.get(i));
+				} else {
+					System.out.print(allFiles.get(i) + ",");
+				}
+			}
+
+			System.out.println("P : ");
+
+			int i = playerStrategyMap.size();
+			Iterator<Player> mapIte = playerStrategyMap.keySet().iterator();
+			while (mapIte.hasNext()) {
+				Player p = mapIte.next();
+				if (i == 0) {
+					System.out.print(playerStrategyMap.get(p));
+				} else {
+					System.out.print(playerStrategyMap.get(p));
+					System.out.println(",");
+				}
+			}
+
+			System.out.println("G : ");
+			System.out.println(numberOfGames);
+
+			System.out.println("D : ");
+			System.out.println(maxTurns);
+
+			printTournamentStats(numberOfGames, allFiles.size());
+		}
+	}
+
+	private void printTournamentStats(int totalGames, int totalFiles) {
+		System.out.println();
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 1; i <= totalFiles; i++) {
+			sb.append("Game ");
+			sb.append(i);
+			sb.append(" ");
+		}
+
+		System.out.println(sb.toString());
+
+		Iterator<String> resultIte = tournamentModeResult.keySet().iterator();
+		int i = 1;
+		while (resultIte.hasNext()) {
+			String key = resultIte.next();
+			List<String> values = tournamentModeResult.get(key);
+			sb = new StringBuilder();
+			sb.append("Map ");
+			sb.append(i);
+			sb.append(" ");
+			values.forEach(val -> {
+				System.out.print(val + " ");
+			});
+
+			i++;
+			System.out.println();
+		}
+
+	}
+
+	private void startUpForNonHumanHelper() {
+		List<Player> playerWithZeroArmy = new ArrayList<Player>();
+		while (playerWithZeroArmy.size() != playersList.size()) {
+			for (Player curPlayer : playersList) {
+				if (curPlayer.getArmy() == 0) {
+					playerWithZeroArmy.add(curPlayer);
+					continue;
+				}
+				gameService.nonHumanStartupPhase(curPlayer, 1, phaseViewModel);
+			}
+		}
+	}
+
+	private void reinforcementForNonHuman(Player curPlayer) {
+		reinforcementArmy(curPlayer);
+		phaseViewModel.setCurrentPhase("Reinforcement Phase for Non Human::");
+		phaseViewModel.setCurrentPlayer(curPlayer.getPlayerName());
+		worldDominationModel.stateUpdate(continentMap, countryMap);
+		curPlayer.reinforcementPhase(null, 0, phaseViewModel);
+	}
+
+	private boolean attackForNonHuman(Player curPlayer, Map<Player, StrategyEnum> playerStrategyMap, String fileName) {
+		phaseViewModel.setCurrentPhaseInfo("Attack Phase for Non Human");
+		Pair<Boolean, Integer> resultOfAttack = curPlayer.attack(null, null, null, true, 0, 0, phaseViewModel);
+		worldDominationModel.stateUpdate(continentMap, countryMap);
+		boolean ifWon = resultOfAttack.getKey();
+
+		if (!cardViewModel.getIfPlayerWonCard() && ifWon) {
+			cardViewModel.setIfPlayerWonCard(ifWon);
+		}
+
+		if (cardViewModel.getIfPlayerWonCard()) {
+			if (cardViewModel.getAllCards().size() != 0) {
+				cardViewModel.giveCardToPlayer(curPlayer);
+			} else {
+				phaseViewModel.setCurrentPhaseInfo(
+						phaseViewModel.getCurrentPhaseInfo() + "\n don't have cards to give to the player");
+				phaseViewModel.allChanged();
+			}
+			cardViewModel.setIfPlayerWonCard(false);
+		}
+
+		if (gameService.ifGameEnded(curPlayer, countryMap.size())) {
+			statOfTorunament = playerStrategyMap.get(curPlayer).toString();
+			List<String> result = new ArrayList<>();
+			if (tournamentModeResult.get(fileName) != null) {
+				result = tournamentModeResult.get(fileName);
+				;
+				result.add(statOfTorunament);
+				tournamentModeResult.put(fileName, result);
+			} else {
+				result.add(fileName);
+				tournamentModeResult.put(fileName, result);
+			}
+
+			return true;
+		}
+		return false;
+	}
+
+	private void fortificationForNonHuman(Player curPlayer) {
+
+		phaseViewModel.setCurrentPhase("Fortification Phase for Non Human");
+		phaseViewModel.setCurrentPlayer(curPlayer.getPlayerName());
+		phaseViewModel.setCurrentPhaseInfo("Fortification Started");
+
+		curPlayer.fortify(null, null, 0, phaseViewModel);
+		worldDominationModel.stateUpdate(continentMap, countryMap);
+
+	}
+
+	public boolean saveGame(Player currentPlayer, String currentPhase, String filePath,
+			Integer playerIndexForStartUpPhase) {
+		File fileToSave = new File(filePath);
+		return gameService.saveGame(fileToSave, continentMap, countryMap, playersList, currentPlayer, currentPhase,
+				cardViewModel, playerIndexForStartUpPhase);
+
+	}
+
+	public Map<Integer, Object> resumeGame(File fileToLoad) {
+
+		GameObject obj = gameService.resumeSavedGame(fileToLoad);
+		if (obj == null) {
+			return null;
+		} else {
+			Map<Integer,Object> answerObj = new HashMap<>();
+			playersList = obj.getPlayerList();
+			continentMap = obj.getContinentMap();
+			countryMap = obj.getCountryMap();
+			MapControllerHelper.getObject().continentMap=continentMap;
+			MapControllerHelper.getObject().countryMap=countryMap;
+			Player currentPlayer = obj.getCurrentPlayer();
+			String currentPhase = obj.getCurrentPhase();
+			cardViewModel = obj.getCardExchangeViewModel();
+			Integer playerIndexForStartUpPhase = obj.getPlayerIndexForStartUpPhase();
+			int phaseIndex = resumeHelper(currentPlayer, currentPhase, playerIndexForStartUpPhase);
+			answerObj.put(1, playersList);
+			answerObj.put(2, playerIndexForStartUpPhase);
+			answerObj.put(3, phaseIndex);
+			answerObj.put(4, currentPhase);
+			answerObj.put(5, currentPlayer);
+			return answerObj;
+		}
+	}
+
+	private int resumeHelper(Player currentPlayer, String currentPhase, Integer playerIndexForStartUpPhase) {
+
+		if (playerIndexForStartUpPhase != null) {
+			phaseViewModel.setCurrentPhase(currentPhase);
+			phaseViewModel.setCurrentPhaseInfo("Start Up Phase for " + currentPlayer.getPlayerName());
+			phaseViewModel.setCurrentPlayer(currentPlayer.getPlayerName());
+			phaseViewModel.allChanged();
+			return 1;
+			// startUpPhase(playersList, playerIndexForStartUpPhase, false, ,
+			// playersList.get(playerIndexForStartUpPhase).getArmy());
+		} else if (currentPhase.equalsIgnoreCase("Reinforcement")) {
+			phaseViewModel.setCurrentPhase(currentPhase);
+			phaseViewModel.setCurrentPhaseInfo("Reinforcement Phase for " + currentPlayer.getPlayerName());
+			phaseViewModel.setCurrentPlayer(currentPlayer.getPlayerName());
+			phaseViewModel.allChanged();
+			return 2;
+		} else if (currentPhase.equalsIgnoreCase("Attack")) {
+			phaseViewModel.setCurrentPhase(currentPhase);
+			phaseViewModel.setCurrentPhaseInfo("Attack Phase for " + currentPlayer.getPlayerName());
+			phaseViewModel.setCurrentPlayer(currentPlayer.getPlayerName());
+			phaseViewModel.allChanged();
+			return 3;
+		} else {
+			phaseViewModel.setCurrentPhase(currentPhase);
+			phaseViewModel.setCurrentPhaseInfo("Fortification Phase for " + currentPlayer.getPlayerName());
+			phaseViewModel.setCurrentPlayer(currentPlayer.getPlayerName());
+			phaseViewModel.allChanged();
+			return 4;
+		}
+	}
 }

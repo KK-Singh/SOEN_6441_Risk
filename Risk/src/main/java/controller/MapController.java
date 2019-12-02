@@ -3,9 +3,9 @@ package controller;
 import java.io.IOException;
 import java.util.Map;
 
+import ControllerHelper.MapControllerHelper;
 import model.Continent;
 import model.Country;
-import service.MapService;
 
 /**
  * MapController class implements the methods of MapService object
@@ -13,7 +13,7 @@ import service.MapService;
  */
 public class MapController {
 
-	MapService serviceObj = MapService.getObject();
+	MapControllerHelper serviceObj = MapControllerHelper.getObject();
 	
 	/**
 	 * This method is used for reading the files

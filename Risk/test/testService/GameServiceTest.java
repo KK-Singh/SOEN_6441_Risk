@@ -12,22 +12,22 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import ControllerHelper.GameControllerHelper;
+import ControllerHelper.MapControllerHelper;
 import model.Continent;
 import model.Country;
 import model.Player;
-import service.GameService;
-import service.MapService;
 
 public class GameServiceTest {
 
-	GameService gameService;
+	GameControllerHelper gameService;
 
 	Map<Integer, Country> countryMapValid;
 	Map<Integer, Continent> continentMapValid;
 
 	@Before
 	public void initialize() {
-		gameService = new GameService();
+		gameService = new GameControllerHelper();
 	}
 
 	@Test
@@ -35,8 +35,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -61,8 +61,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -89,8 +89,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -109,8 +109,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -131,8 +131,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -153,8 +153,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -174,8 +174,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -200,8 +200,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -226,8 +226,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -252,8 +252,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -278,8 +278,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -306,8 +306,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
@@ -335,8 +335,8 @@ public class GameServiceTest {
 		countryMapValid = new HashMap<Integer, Country>();
 		continentMapValid = new HashMap<Integer, Continent>();
 		setUpValidMap();
-		MapService.getObject().continentMap = continentMapValid;
-		MapService.getObject().countryMap = countryMapValid;
+		MapControllerHelper.getObject().continentMap = continentMapValid;
+		MapControllerHelper.getObject().countryMap = countryMapValid;
 		Player p1, p2;
 		List<Player> playerList = new ArrayList<>();
 		p1 = new Player("p1");
