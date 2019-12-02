@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import controller.MapVerification;
 import model.Continent;
 import model.Country;
 /**
@@ -427,7 +426,7 @@ public class MapService {
 
 		MapService service = new MapService();
 		try {
-			service.readFile("C:\\Users\\Shivam\\Downloads\\RISK-1.0\\Resources\\Asia.map");
+			service.readFile("Resources\\Asia.map");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

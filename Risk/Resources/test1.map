@@ -1,6 +1,7 @@
 [Continents]
 asia=10
 europe=15
+austrailia=12
 
 [Territories]
 india,0,0,asia,pakistan

@@ -1,4 +1,4 @@
-package controller;
+package service;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -146,7 +146,7 @@ public class MapVerification {
 	 * This method is used for checking every methods are validate or not
 	 * @return boolean
 	 */
-//method to call all check methods from UI
+
 	public boolean validateMethod() {
 //		TwoWayCheck();
 		Neighborcheck();
@@ -156,7 +156,7 @@ public class MapVerification {
 		if(ErrorList.size()>0) {
 			System.out.println(ErrorList);
 			return false;
-//		UI part:	
+	
 		}
 		else
 			return true;

@@ -26,7 +26,7 @@ public class MapController {
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 			return e.getMessage();
 		}
 		return "File Read Successfully";
