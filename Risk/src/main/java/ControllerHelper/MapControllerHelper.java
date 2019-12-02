@@ -1,4 +1,4 @@
-package service;
+package ControllerHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,165 +11,82 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import model.ConquestMapFile;
 import model.Continent;
 import model.Country;
+import model.DominationMapFile;
+import model.ReadWriteAdapter;
+
 /**
-* This MapService file can contains the core functions
-* for the risk game.
-* @author  Yash
-* @version 1.2
-*/
-public class MapService {
+ * This MapService file can contains the core functions for the risk game.
+ * 
+ * @author Yash
+ * @version 1.2
+ */
+public class MapControllerHelper {
 
 	public Map<Integer, Continent> continentMap = new HashMap<Integer, Continent>();
 	public Map<Integer, Country> countryMap = new HashMap<Integer, Country>();
-	private static MapService obj;
-	
-	
-    /** MapService constructor */
-	private MapService() {
+	private static MapControllerHelper obj;
+	ConquestMapFile conqFile = new ConquestMapFile();
+	DominationMapFile domFile = new DominationMapFile();
+	ReadWriteAdapter adapter = new ReadWriteAdapter(domFile, conqFile);
+
+	/** MapService constructor */
+	private MapControllerHelper() {
 		// TODO Auto-generated constructor stub
 	}
 
-	
 	/**
-	* This method is used to get the MapService object
-	* if object is not yet created then it create object first
-	* and then return the MapService object
-	* @return MapService object of MapService
-	*/
-	public static MapService getObject() {
+	 * This method is used to get the MapService object if object is not yet created
+	 * then it create object first and then return the MapService object
+	 * 
+	 * @return MapService object of MapService
+	 */
+	public static MapControllerHelper getObject() {
 		if (obj == null) {
-			obj = new MapService();
+			obj = new MapControllerHelper();
 
 		}
 		return obj;
 	}
 
-	
 	/**
-	* This method is used to read the map file
-	* and add continents, countries and neighbors of the countries
-	* @param filePath path of the file that going to be read
-	* @exception IOException if data from file cannot be readable to or closed. 
-	*/
+	 * This method is used to read the map file and add continents, countries and
+	 * neighbors of the countries
+	 * 
+	 * @param filePath
+	 *            path of the file that going to be read
+	 * @exception IOException
+	 *                if data from file cannot be readable to or closed.
+	 */
 	public void readFile(String filePath) throws IOException {
-
-		File file = new File(filePath);
-		BufferedReader br = new BufferedReader(new FileReader(file));
-
-		String input;
-		int cont_id = 0;
-		int country_id = 0;
-		while ((input = br.readLine()) != null) {
-
-			if (input.contains("Continents")) {
-				while ((input = br.readLine()) != "") {
-					if (input.trim().isEmpty())
-						break;
-					String[] cont = input.split("=");
-
-					Continent c = new Continent(Integer.valueOf(cont[1]), cont[0].replaceAll("\\s", "").toLowerCase());
-					continentMap.put(cont_id, c);
-					cont_id++;
-				}
-			}
-
-			if (input.contains("Territories")) {
-				while ((input = br.readLine()) != null) {
-					if (input.trim().isEmpty())
-						continue;
-					String[] countryIn = input.split(",");
-					String continentName = countryIn[3];
-					Country country = getCountry(countryIn[0].replaceAll("\\s", "").toLowerCase());
-					if (country == null) {
-						country = new Country(countryIn[0].replaceAll("\\s", "").toLowerCase());
-						countryMap.put(country_id, country);
-						country_id++;
-					}
-
-					Continent countryContinent = getContinent(continentName.replaceAll("\\s", "").toLowerCase());
-					countryContinent.addCountry(country);
-
-					List<Country> nearByCountries = new ArrayList<Country>();
-					for (int i = 4; i < countryIn.length; i++) {
-						Country c = getCountry(countryIn[i].replaceAll("\\s", "").toLowerCase());
-						if (c == null) {
-							c = new Country(countryIn[i].replaceAll("\\s", "").toLowerCase());
-							countryMap.put(country_id, c);
-							country_id++;
-						}
-						nearByCountries.add(c);
-					}
-					country.setNeighbors(nearByCountries);
-					country.setContinent(countryContinent);
-				}
-			}
-
-		}
-		br.close();
+		adapter.readFile(filePath, continentMap, countryMap);
 	}
 
-	
 	/**
-	* This method is used to save the map file
-	* @param filePath path of the file that going to be read
-	* @exception IOException if stream to file cannot be written to or closed. 
-	*/
+	 * This method is used to save the map file
+	 * 
+	 * @param filePath
+	 *            path of the file that going to be read
+	 * @exception IOException
+	 *                if stream to file cannot be written to or closed.
+	 */
 	public void saveFile(String filePath) throws Exception {
+		adapter.writeFile(filePath, continentMap, countryMap);
 
-		File file = new File(filePath);
-		PrintWriter pw = new PrintWriter(file);
-		pw.println("[Continents]");
-		continentMap.forEach((k, v) -> {
-			pw.println(v.getName() + "=" + v.getArmyValue());
-		});
-
-		pw.println();
-		pw.println("[Territories]");
-
-		Iterator<Integer> ite = countryMap.keySet().iterator();
-		String prevCont = null;
-		int fKey = ite.next();
-		prevCont = countryMap.get(fKey).getName();
-		ite = countryMap.keySet().iterator();
-		while (ite.hasNext()) {
-			int key = ite.next();
-			Country cont = countryMap.get(key);
-			String curCont = cont.getContinent().getName();
-			pw.print(cont.getName() + "," +"0,0,"+ cont.getContinent().getName() + ",");
-			for (int i = 0; i < cont.getNeighbors().size(); i++) {
-				pw.print(cont.getNeighbors().get(i).getName());
-				if (i < cont.getNeighbors().size() - 1)
-					pw.print(",");
-			}
-			pw.println();
-			if (prevCont != curCont) {
-				pw.println();
-			}
-			prevCont = curCont;
-		}
-		// countryMap.forEach((k, v) -> {
-		//
-		// pw.print(v.getName() + "," + v.getContinent().getName() + ",");
-		// for (int i = 0; i < v.getNeighbors().size(); i++) {
-		// pw.print(v.getNeighbors().get(i).getName());
-		// if (i < v.getNeighbors().size() - 1)
-		// pw.print(",");
-		// }
-		// pw.println();
-		// });
-		pw.println();
-		pw.close();
 	}
 
 	// adding continent
 	/**
-	* This method is used to add continent in continent map object
-	* @param continentname name of the continent
-	* @param continentvalue continent value
-	* @return String it returns statement of operation
-	*/
+	 * This method is used to add continent in continent map object
+	 * 
+	 * @param continentname
+	 *            name of the continent
+	 * @param continentvalue
+	 *            continent value
+	 * @return String it returns statement of operation
+	 */
 	public String addContinent(String continentname, int continentvalue) {
 		try {
 			Continent continent = new Continent(continentvalue, continentname);
@@ -183,12 +100,13 @@ public class MapService {
 		return continentname + " Added Successfully";
 	}
 
-	
 	/**
-	* This method is used to remove continent in continent map object
-	* @param continentname name of the continent
-	* @return String it returns statement of operation
-	*/
+	 * This method is used to remove continent in continent map object
+	 * 
+	 * @param continentname
+	 *            name of the continent
+	 * @return String it returns statement of operation
+	 */
 	public String removeContinent(String continentname) {
 		try {
 
@@ -226,15 +144,17 @@ public class MapService {
 		return continentname + " removed successfully";
 
 	}
-	
-	
+
 	/**
-	* This method is used to add country in country map object
-	* and set the continent for the country
-	* @param countryName name of the country
-	* @param continentName name of the continent
-	* @return String it returns statement of operation
-	*/
+	 * This method is used to add country in country map object and set the
+	 * continent for the country
+	 * 
+	 * @param countryName
+	 *            name of the country
+	 * @param continentName
+	 *            name of the continent
+	 * @return String it returns statement of operation
+	 */
 	public String addCountry(String countryName, String continentName) {
 		// Continent continent = new Continent(continentvalue, continentname);
 		try {
@@ -253,13 +173,14 @@ public class MapService {
 		return countryName + " Added Successfully";
 		// continentMap.put(id, continent);
 	}
-	
-	
+
 	/**
-	* This method is used to remove country in country map object
-	* @param countryName name of the country
-	* @return String it returns statement of operation
-	*/
+	 * This method is used to remove country in country map object
+	 * 
+	 * @param countryName
+	 *            name of the country
+	 * @return String it returns statement of operation
+	 */
 	public String removeCountry(String countryName) {
 		try {
 			Iterator<Integer> ite = countryMap.keySet().iterator();
@@ -289,13 +210,15 @@ public class MapService {
 		return countryName + " removed successfully";
 	}
 
-
 	/**
-	* This method is used to add neighbor from country to another country
-	* @param countryname name of the country
-	* @param neighbourcountryname name of the neighbor country
-	* @return String it returns neighbor country name and result of operation
-	*/
+	 * This method is used to add neighbor from country to another country
+	 * 
+	 * @param countryname
+	 *            name of the country
+	 * @param neighbourcountryname
+	 *            name of the neighbor country
+	 * @return String it returns neighbor country name and result of operation
+	 */
 	public String addNeighbour(String countryname, String neighbourcountryname) {
 		try {
 			Country country1 = getCountry(countryname);
@@ -320,14 +243,16 @@ public class MapService {
 		return neighbourcountryname + " added successfully";
 
 	}
-	
-	
+
 	/**
-	* This method is used to remove neighbor from country to another country
-	* @param countryname name of the country
-	* @param neighbourcountryname name of the neighbor country
-	* @return String it returns neighbor country name and result of operation
-	*/
+	 * This method is used to remove neighbor from country to another country
+	 * 
+	 * @param countryname
+	 *            name of the country
+	 * @param neighbourcountryname
+	 *            name of the neighbor country
+	 * @return String it returns neighbor country name and result of operation
+	 */
 	public String removeNeighbour(String countryname, String neighbourcountryname) {
 		try {
 			Country country1 = getCountry(countryname);
@@ -353,8 +278,8 @@ public class MapService {
 	}
 
 	/**
-	* This method is used to show the map on the console.
-	*/
+	 * This method is used to show the map on the console.
+	 */
 	public void showMap() {
 		continentMap.forEach((k, v) -> {
 			System.out.println("Continent is " + v);
@@ -364,13 +289,14 @@ public class MapService {
 			});
 		});
 	}
-	
-	
+
 	/**
-	* This method is used to get country object
-	* @param name name of the country
-	* @return Country it returns country object if exists
-	*/
+	 * This method is used to get country object
+	 * 
+	 * @param name
+	 *            name of the country
+	 * @return Country it returns country object if exists
+	 */
 	public Country getCountry(String name) {
 
 		Iterator<Integer> ite = countryMap.keySet().iterator();
@@ -384,13 +310,14 @@ public class MapService {
 		return null;
 
 	}
-	
-	
+
 	/**
-	* This method is used to get continent object
-	* @param name name of the continent
-	* @return Continent it returns continent object if exists
-	*/
+	 * This method is used to get continent object
+	 * 
+	 * @param name
+	 *            name of the continent
+	 * @return Continent it returns continent object if exists
+	 */
 	public Continent getContinent(String name) {
 		Iterator<Integer> ite = continentMap.keySet().iterator();
 
@@ -403,11 +330,11 @@ public class MapService {
 		return null;
 	}
 
-	
 	/**
-	* This method is used to validate the map
-	* @return boolean it returns true if map is valid else false
-	*/
+	 * This method is used to validate the map
+	 * 
+	 * @return boolean it returns true if map is valid else false
+	 */
 	public boolean mapValidate() {
 		MapVerification mapVerification = new MapVerification(countryMap, continentMap);
 		if (!mapVerification.validateMethod()) {
@@ -417,14 +344,15 @@ public class MapService {
 		return true;
 	}
 
-	
 	/**
-	* This is java main method
-	* @param args arguments for main method
-	*/
+	 * This is java main method
+	 * 
+	 * @param args
+	 *            arguments for main method
+	 */
 	public static void main(String[] args) {
 
-		MapService service = new MapService();
+		MapControllerHelper service = new MapControllerHelper();
 		try {
 			service.readFile("Resources\\Asia.map");
 		} catch (IOException e) {
