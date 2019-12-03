@@ -38,7 +38,12 @@ import model.StrategyEnum;
 * @version 1.2
 */
 import model.StrategyInterface;
-
+/**
+ * This MapService file can contains the core functions for the risk game.
+ * 
+ * @author Yash
+ * @version 1.2
+ */
 public class GameControllerHelper {
 
 	/**
