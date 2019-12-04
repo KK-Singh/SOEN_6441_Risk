@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+/**
+ * @author Tapan
+ */
 
 public class ConquestMapFile implements Serializable{
 
@@ -19,6 +22,10 @@ public class ConquestMapFile implements Serializable{
 	 * 
 	 * @param filePath
 	 *            path of the file that going to be read
+	 * @param continentMap
+	 *               Map of the continent 
+	 *  @param countryMap
+	 *               Map of the country       
 	 * @exception IOException
 	 *                if data from file cannot be readable to or closed.
 	 */
@@ -84,10 +91,10 @@ public class ConquestMapFile implements Serializable{
 		}
 		br.close();
 	}
-
 	/**
 	* This method is used to get country object
 	* @param name name of the country
+	* @param countryMap Map of the country 
 	* @return Country it returns country object if exists
 	*/
 	public Country getCountry(String name, Map<Integer, Country> countryMap) {
@@ -104,7 +111,6 @@ public class ConquestMapFile implements Serializable{
 
 	}
 	
-
 	/**
 	* This method is used to get continent object
 	* @param name name of the continent
@@ -124,7 +130,8 @@ public class ConquestMapFile implements Serializable{
 	
 	/**
 	 * This method is used to save the map file
-	 * 
+	 * @param continentMap
+	 *               Map of the continent
 	 * @param filePath
 	 *            path of the file that going to be read
 	 * @exception IOException

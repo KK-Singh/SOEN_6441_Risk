@@ -1,6 +1,6 @@
 package model;
 
-import java.io.BufferedReader;
+import java.io.BufferedReader;	
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,8 +11,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DominationMapFile class read show and save file with implementation of Serializable interface
+ * @author Tapan
+ * @version 1.3
+ */
+
 public class DominationMapFile implements Serializable{
 
+	/**
+	 * This method read map file through file path
+	 * @param filePath location of file
+	 * @param continentMap map of continent 
+	 * @param countryMap map of country
+	 * @throws IOException if data from file can not be readable
+	 */
 	public void readFile(String filePath, Map<Integer, Continent> continentMap, Map<Integer, Country> countryMap)
 			throws IOException {
 
@@ -78,6 +91,13 @@ public class DominationMapFile implements Serializable{
 		br.close();
 	}
 
+	/**
+	 * This method save map file after reading and processing it
+	 * @param filePath location of file
+	 * @param continentMap map of continent 
+	 * @param countryMap map of country
+	 * @throws IOException if data from file can not be saved
+	 */
 	public void saveFile(String filePath, Map<Integer, Continent> continentMap, Map<Integer, Country> countryMap)
 			throws IOException {
 
