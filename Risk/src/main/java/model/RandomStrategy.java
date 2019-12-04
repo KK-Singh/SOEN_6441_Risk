@@ -120,6 +120,7 @@ public class RandomStrategy implements StrategyInterface,Serializable {
 			phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo()+" \n There is no country to attack from "+ attackerCountry.getName());
 			return new Pair<Boolean, Integer>(ifWon, null);
 		}else {
+			defender= defenderCountry.getCountryOwner();
 			phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo()+" Random Defender Country is "+ defenderCountry.getName());
 			
 			for(int i=0;i<noOfAttack;i++) {
