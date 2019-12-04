@@ -8,17 +8,38 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * This ReadWriteAdapter file can contains read write over-ride functions
+ * and read write adaptor and function to check file type
+ * 
+ * @author Yash
+ * @version 1.2
+ */
+
 public class ReadWriteAdapter implements ReadWriteFile,Serializable {
 
 	DominationMapFile domFile;
 	ConquestMapFile conqFile;
-
+	
+	
+	/**
+	 * This is a read write adaptor
+	 * @param domFile : this is a domination map file object
+	 * @param conqFile : this is a conquest map file object
+	 */
 	public ReadWriteAdapter(DominationMapFile domFile, ConquestMapFile conqFile) {
 		super();
 		this.domFile = domFile;
 		this.conqFile = conqFile;
 	}
-
+	
+	
+	/**
+	 * This method is used for reading the map from the file
+	 * @param filePath : to specify path of the file
+	 * @param continentMap : this is a map of continent
+	 * @param countryMap : this is a map of continent
+	 */
 	@Override
 	public void readFile(String filePath, Map<Integer, Continent> continentMap, Map<Integer, Country> countryMap)
 			throws IOException {
@@ -31,7 +52,14 @@ public class ReadWriteAdapter implements ReadWriteFile,Serializable {
 		}
 
 	}
-
+	
+	
+	/**
+	 * This method is used for writing the map data to the file
+	 * @param filePath : to specify path of the file
+	 * @param continentMap : this is a map of continent
+	 * @param countryMap : this is a map of continent
+	 */
 	@Override
 	public void writeFile(String filePath, Map<Integer, Continent> continentMap, Map<Integer, Country> countryMap)
 			throws Exception {
@@ -44,7 +72,14 @@ public class ReadWriteAdapter implements ReadWriteFile,Serializable {
 		}
 
 	}
-
+	
+	
+	/**
+	 * This method is used for checking type of file
+	 * @param filePath : to specify path of the file
+	 * @return int : it will return 1 if input type is country
+	 * and 2 for territories else it will return -1
+	 */
 	private int checkfileType(String filePath) throws IOException {
 		File file = new File(filePath);
 		BufferedReader br = new BufferedReader(new FileReader(file));
