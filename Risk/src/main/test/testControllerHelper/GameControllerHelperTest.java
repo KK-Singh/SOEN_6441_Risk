@@ -21,18 +21,27 @@ import model.Player;
 import model.RandomStrategy;
 import model.StrategyEnum;
 
+/**
+ * This class have test cases for Game Controllers
+ * @author kunal
+ * 
+ */
 public class GameControllerHelperTest {
 
 	GameControllerHelper gameService;
 
 	Map<Integer, Country> countryMapValid;
 	Map<Integer, Continent> continentMapValid;
-
+/**
+ * this method setup require common context before every test is run
+ */
 	@Before
 	public void initialize() {
 		gameService = new GameControllerHelper();
 	}
-
+/**
+ * This test will test the StartUpPhase
+ */
 	@Test
 	public void testValidStartUpPhase() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -58,7 +67,9 @@ public class GameControllerHelperTest {
 		gameService.fillPlayerCountry(p1, temp.getName(), army);
 		assertTrue(temp.getArmyCount() == (prevCountryArmy + army));
 	}
-
+/**
+ * this test will test reinforcement of Armies
+ */
 	@Test
 	public void testReinforcementArmies() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -86,7 +97,9 @@ public class GameControllerHelperTest {
 		assertEquals(7, p1.getArmy());
 		assertEquals(8, p2.getArmy());
 	}
-
+/**
+ * this test will test if the Game is running
+ */
 	@Test
 	public void testIfgameEndedFalse() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -127,7 +140,9 @@ public class GameControllerHelperTest {
 				countryMapValid.get(4)));
 		assertTrue(gameService.ifGameEnded(p1, countryMapValid.size()));
 	}
-
+/**
+ * this test will test Continent Owned by player
+ */
 	@Test
 	public void testIfContinentOwnedTrue() {
 
@@ -171,7 +186,9 @@ public class GameControllerHelperTest {
 				countryMapValid.get(4)));
 		assertTrue(!gameService.ifContinetOwned(continentMapValid.get(1), p2));
 	}
-
+	/**
+	 * this test will test dice roll 
+	 */
 	@Test
 	public void testValidateSelectedNumberOfDiceWrongInput() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -197,7 +214,9 @@ public class GameControllerHelperTest {
 		assertEquals("Enter Valid Number for Attacker and Defender", gameService
 				.validateSelectedNumberOfDice(countryMapValid.get(1), countryMapValid.get(3), "dss", "adsds"));
 	}
-
+	/**
+	 * this test will test if the dice rolled by attacker is wrong
+	 */
 	@Test
 	public void testValidateSelectedNumberOfDiceAttackerWrong() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -223,7 +242,9 @@ public class GameControllerHelperTest {
 		assertEquals("Selected attacker can roll min 1 and max 1",
 				gameService.validateSelectedNumberOfDice(countryMapValid.get(1), countryMapValid.get(3), "3", "2"));
 	}
-
+	/**
+	 * this test will test if the dice rolled by defender is wrong
+	 */
 	@Test
 	public void testValidateSelectedNumberOfDiceDefenderWrong() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -249,7 +270,9 @@ public class GameControllerHelperTest {
 		assertEquals("Selected defender can roll min 1 and max 1",
 				gameService.validateSelectedNumberOfDice(countryMapValid.get(1), countryMapValid.get(3), "2", "2"));
 	}
-
+	/**
+	 * this test will test number of dice rolled is correct
+	 */
 	@Test
 	public void testValidateSelectedNumberOfDiceCorrectInput() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -275,7 +298,9 @@ public class GameControllerHelperTest {
 		assertEquals("ValidChoice",
 				gameService.validateSelectedNumberOfDice(countryMapValid.get(1), countryMapValid.get(3), "2", "2"));
 	}
-
+	/**
+	 * this test will test fortification
+	 */
 	@Test
 	public void testValidateFortificationWrongCountry() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -303,7 +328,9 @@ public class GameControllerHelperTest {
 		countryMapValid.get(3).setArmyCount(5);
 		assertTrue(gameService.validateFortification(countryMapValid.get(1), countryMapValid.get(3), 2).size() > 0);
 	}
-
+	/**
+	 * this test will test if army move during fortification phase is valid
+	 */
 	@Test
 	public void testValidateFortificationWrongArmyMove() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -332,7 +359,9 @@ public class GameControllerHelperTest {
 		assertEquals(Arrays.asList("Cannot move army from the Country"),
 				gameService.validateFortification(countryMapValid.get(1), countryMapValid.get(2), 2));
 	}
-
+	/**
+	 * this test will test fortification 
+	 */
 	@Test
 	public void testValidateFortificationCorrect() {
 		countryMapValid = new HashMap<Integer, Country>();
@@ -360,7 +389,9 @@ public class GameControllerHelperTest {
 		countryMapValid.get(3).setArmyCount(5);
 		assertTrue(gameService.validateFortification(countryMapValid.get(1), countryMapValid.get(2), 2).size() == 0);
 	}
-
+	/**
+	 * this test will test the Army count based on player
+	 */
 	@Test
 	public void testGetArmyCountBasedOnPlayers() {
 		Player p1, p2;
@@ -373,32 +404,40 @@ public class GameControllerHelperTest {
 		assertEquals(40, armyCount);
 	}
 
-	public void testValidMoveAfterConquering() {
-
-	}
+	/**
+	 * this test will test if SaveMap is invalid  
+	 */
 
 	@Test
 	public void testSaveMapFail() {
 		assertTrue(!gameService.saveGame(null, continentMapValid, countryMapValid, null, null, null, null, -1));
 	}
-
+	/**
+	 * this test will test if save Map is valid
+	 */
 	@Test
 	public void testSaveMapPass() {
-		File f = new File("C:\\Users\\Shivam\\Downloads\\Risk\\Resources\\TestingSave.map");
+		File f = new File("Resources\\TestingSave.map");
 		assertTrue(gameService.saveGame(f, continentMapValid, countryMapValid, null, null, null, null, -1));
 	}
-
+	/**
+	 * this test will test if the LoadMap is invalid
+	 */
 	@Test
 	public void testLoadMapFail() {
 		assertTrue(gameService.resumeSavedGame(null) == null);
 	}
-
+	/**
+	 * this test will test if the Load Map is Pass
+	 */
 	@Test
 	public void testLoadMapPass() {
-		File f = new File("C:\\Users\\Shivam\\Downloads\\Risk\\Resources\\TestingLoadMap.map");
+		File f = new File("Resources\\TestingLoadMap.map");
 		assertTrue(gameService.resumeSavedGame(f) != null);
 	}
-
+	/**
+	 * this test will test if the player strategy for tournament Human fail
+	 */
 	@Test
 	public void testPlayerStartegyForTournamentHumanFail() {
 		Map<Player,StrategyEnum> map = new HashMap<>();
@@ -406,7 +445,9 @@ public class GameControllerHelperTest {
 		map.put(new Player("P2"), StrategyEnum.HUMAN);
 		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==-2);
 	}
-
+	/**
+	 * this test will test if the player strategy for tournament Human pass
+	 */
 	@Test
 	public void testPlayerStartegyForTournamentNonHumanPass() {
 		Map<Player,StrategyEnum> map = new HashMap<>();
@@ -414,7 +455,9 @@ public class GameControllerHelperTest {
 		map.put(new Player("P2"), StrategyEnum.RANDOM);
 		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==0);
 	}
-
+	/**
+	 * this test will test if the player strategy is null 
+	 */
 	@Test
 	public void testPlayerStartegyForTournamentNullFail() {
 		Map<Player,StrategyEnum> map = new HashMap<>();
@@ -422,7 +465,9 @@ public class GameControllerHelperTest {
 		map.put(new Player("P2"), StrategyEnum.RANDOM);
 		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==-1);
 	}
-	
+	/**
+	 * this test will test if all player strategy is null
+	 */
 	@Test
 	public void testPlayerStartegyForTournamentAllNullFail() {
 		Map<Player,StrategyEnum> map = new HashMap<>();
@@ -430,7 +475,9 @@ public class GameControllerHelperTest {
 		map.put(new Player("P2"), null);
 		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==-1);
 	}
-	
+	/**
+	 * this test will test if the player strategy exist
+	 */
 	@Test
 	public void testGetPlayerStrategyIfExists() {
 		Map<Player,StrategyEnum> map = new HashMap<>();
@@ -451,7 +498,9 @@ public class GameControllerHelperTest {
 		
 		assertTrue(gameService.getPlayerStrategy(map, p1)==null);
 	}
-
+	/**
+	 * this test is to test setting up valid map
+	 */
 	private void setUpValidMap() {
 		Continent cont1 = new Continent(4, "Cont1");
 		Continent cont2 = new Continent(5, "Cont2");

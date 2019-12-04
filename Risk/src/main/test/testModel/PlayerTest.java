@@ -8,9 +8,15 @@ import model.Country;
 import model.HumanStrategy;
 import model.PhaseViewModel;
 import model.Player;
-
+/**
+ * this class have test cases for player methods
+ * @author kunal
+ *
+ */
 public class PlayerTest {
-
+	/**
+	 * this test will test the valid move after attack
+	 */
 	@Test
 	public void validateMoveAfterAttack() {
 		Country c1 = new Country("c1");

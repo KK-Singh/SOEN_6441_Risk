@@ -17,13 +17,18 @@ import model.Continent;
 import model.Country;
 
 /**
+ * This class have test cases for map verification
  * @author Pegah
  *
  */
 public class MapVerificationTest {
-
+	/**
+	 * this hold the instance of MapVerication object for valid map
+	 */
 	public MapVerification objMapVerificationValidMap;
-	
+	/**
+	 * this hold the instance of Mapverification for Invalid Map
+	 */
 	public MapVerification objMapVerificationInvalidMap;
 
 	Map<Integer,Country> countryMapInvalid;
@@ -33,6 +38,7 @@ public class MapVerificationTest {
 	Map<Integer,Continent> continentMapValid;
 	
 	/**
+	 * this method setup require common context before every test is run
 	 * @throws java.lang.Exception
 	 */
 	@Before
@@ -52,25 +58,26 @@ public class MapVerificationTest {
 		
 	}
 	
-
-	// Neighborcheck();
-	// ContinentUnusedCheck();
-	// CountryInMultiContinentCheck();
-	// NoContinentOrCountry();
-	
+	/**
+	 * This test will test neighbors 
+	 */
 	@Test
 	public void checkNeighborsInvalidMap() {
 		
 		objMapVerificationInvalidMap.Neighborcheck();
 		assertTrue(objMapVerificationInvalidMap.ErrorList.size()>0);
 	}
-
+	/**
+	 * this test will test if there is any unused continent in map
+	 */
 	@Test
 	public void checkUsedContinentsInvalidMap() {
 		objMapVerificationInvalidMap.ContinentUnusedCheck();
 		assertTrue(objMapVerificationInvalidMap.ErrorList.size()>0);
 	}
-
+	/**
+	 * this test will test if the country is in multiple Continent
+	 */
 	@Test
 	public void CountryInMultiContinentCheckInvalidMap() {
 		
@@ -78,34 +85,44 @@ public class MapVerificationTest {
 		assertTrue(objMapVerificationInvalidMap.ErrorList.size()>0);
 	}
 
-
+	/**
+	 * this test will test the neighbors in a valid map
+	 */
 	@Test
 	public void checkNeighborsValidMap() {
 		
 		objMapVerificationValidMap.Neighborcheck();
 		assertTrue(objMapVerificationValidMap.ErrorList.size()==0);
 	}
-
+	/**
+	 * this test will test verify the Continent in valid map
+	 */
 	@Test
 	public void checkUsedContinentsValidMap() {
 		objMapVerificationValidMap.ContinentUnusedCheck();
 		assertTrue(objMapVerificationValidMap.ErrorList.size()==0);
 	}
-
+	/**
+	 * this test is to test the country in Multiple Continent in Valid map
+	 */
 	@Test
 	public void CountryInMultiContinentCheckValidMap() {
 		
 		objMapVerificationValidMap.CountryInMultiContinentCheck();
 		assertTrue(objMapVerificationValidMap.ErrorList.size()==0);
 	}
-
+	/**
+	 * this test will test if there is no country in a Continent
+	 */
 	@Test
 	public void NoContinentOrCountryValidMap() {
 		objMapVerificationValidMap.NoContinentOrCountry();
 		assertTrue(objMapVerificationValidMap.ErrorList.size()==0);
 	}
 	
-	
+	/**
+	 * this method is to create instances for invalid map
+	 */
 	private void setUpInvalidMap() {
 		
 		Continent cont1 = new Continent(4, "Cont1");
@@ -146,7 +163,9 @@ public class MapVerificationTest {
 		continentMapInvalid.put(2, cont2);
 		continentMapInvalid.put(3, cont3);
 	}
-	
+	/**
+	 * this method is for creating the instance for valid map test
+	 */
 	private void setUpValidMap() {
 		Continent cont1 = new Continent(4, "Cont1");
 		Continent cont2 = new Continent(5, "Cont2");
