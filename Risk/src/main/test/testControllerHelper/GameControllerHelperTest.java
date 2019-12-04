@@ -1,8 +1,9 @@
-package testService;
+package testControllerHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,8 +18,10 @@ import ControllerHelper.MapControllerHelper;
 import model.Continent;
 import model.Country;
 import model.Player;
+import model.RandomStrategy;
+import model.StrategyEnum;
 
-public class GameServiceTest {
+public class GameControllerHelperTest {
 
 	GameControllerHelper gameService;
 
@@ -369,9 +372,84 @@ public class GameServiceTest {
 		int armyCount = gameService.getArmyCountBasedOnPlayers(playerList);
 		assertEquals(40, armyCount);
 	}
-	
+
 	public void testValidMoveAfterConquering() {
+
+	}
+
+	@Test
+	public void testSaveMapFail() {
+		assertTrue(!gameService.saveGame(null, continentMapValid, countryMapValid, null, null, null, null, -1));
+	}
+
+	@Test
+	public void testSaveMapPass() {
+		File f = new File("C:\\Users\\Shivam\\Downloads\\Risk\\Resources\\TestingSave.map");
+		assertTrue(gameService.saveGame(f, continentMapValid, countryMapValid, null, null, null, null, -1));
+	}
+
+	@Test
+	public void testLoadMapFail() {
+		assertTrue(gameService.resumeSavedGame(null) == null);
+	}
+
+	@Test
+	public void testLoadMapPass() {
+		File f = new File("C:\\Users\\Shivam\\Downloads\\Risk\\Resources\\TestingLoadMap.map");
+		assertTrue(gameService.resumeSavedGame(f) != null);
+	}
+
+	@Test
+	public void testPlayerStartegyForTournamentHumanFail() {
+		Map<Player,StrategyEnum> map = new HashMap<>();
+		map.put(new Player("P1"), StrategyEnum.HUMAN);
+		map.put(new Player("P2"), StrategyEnum.HUMAN);
+		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==-2);
+	}
+
+	@Test
+	public void testPlayerStartegyForTournamentNonHumanPass() {
+		Map<Player,StrategyEnum> map = new HashMap<>();
+		map.put(new Player("P1"), StrategyEnum.CHEATER);
+		map.put(new Player("P2"), StrategyEnum.RANDOM);
+		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==0);
+	}
+
+	@Test
+	public void testPlayerStartegyForTournamentNullFail() {
+		Map<Player,StrategyEnum> map = new HashMap<>();
+		map.put(new Player("P1"), null);
+		map.put(new Player("P2"), StrategyEnum.RANDOM);
+		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==-1);
+	}
+	
+	@Test
+	public void testPlayerStartegyForTournamentAllNullFail() {
+		Map<Player,StrategyEnum> map = new HashMap<>();
+		map.put(new Player("P1"), null);
+		map.put(new Player("P2"), null);
+		assertTrue(gameService.validatePlayerStrategyMappingForTournament(map)==-1);
+	}
+	
+	@Test
+	public void testGetPlayerStrategyIfExists() {
+		Map<Player,StrategyEnum> map = new HashMap<>();
+		Player p1 = new Player("P1");
+		Player p2 = new Player("P2");
+		map.put(p1, StrategyEnum.CHEATER);
+		map.put(p2, StrategyEnum.RANDOM);
 		
+		assertTrue(gameService.getPlayerStrategy(map, p2) instanceof RandomStrategy);
+	}
+	
+	@Test
+	public void testGetPlayerStrategyIfNotExists() {
+		Map<Player,StrategyEnum> map = new HashMap<>();
+		Player p1 = new Player("P1");
+		Player p2 = new Player("P2");
+		map.put(p2, StrategyEnum.RANDOM);
+		
+		assertTrue(gameService.getPlayerStrategy(map, p1)==null);
 	}
 
 	private void setUpValidMap() {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package testService;
+package testControllerHelper;
 
 import static org.junit.Assert.assertTrue;
 
