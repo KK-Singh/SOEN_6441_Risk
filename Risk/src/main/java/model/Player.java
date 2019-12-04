@@ -1,14 +1,18 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
+import ControllerHelper.MapControllerHelper;
 import javafx.util.Pair;
 
 /**
  * @author Gurwinder Kaur
  */
-public class Player {
+public class Player implements Serializable {
 	/**
 	 * name : Represents name
 	 */

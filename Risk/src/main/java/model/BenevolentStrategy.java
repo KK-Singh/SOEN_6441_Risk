@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,17 +8,19 @@ import java.util.Queue;
 
 import javafx.util.Pair;
 
-public class BenevolentStrategy implements StrategyInterface{
+public class BenevolentStrategy implements StrategyInterface,Serializable{
 
 	@Override
 	public void reinforcement(Player player, Country reinforcementCountry, int noOfArmies,
 			PhaseViewModel phaseViewModel) {
 		
 		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() +"\n reinforcing for benevolent player");
+		phaseViewModel.allChanged();
 		reinforcementCountry= findWeekestCountry(player);
 		reinforcementCountry.setArmyCount(reinforcementCountry.getArmyCount()+player.getArmy());
 		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo()+"\nmoved"+ player.getArmy()+ "to weekestcountry"
 				+ reinforcementCountry.getName());
+		phaseViewModel.allChanged();
 		player.setArmy(0);
 		
 		
@@ -28,8 +31,9 @@ public class BenevolentStrategy implements StrategyInterface{
 			PhaseViewModel phaseViewModel) {
 		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() +"\n fortifying for benevolent player");
 		toCountry=findWeekestCountry(player);
-		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() +"fortifying weekest country"+ toCountry.getName());
-			
+		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() +"fortifying weakest country"+ toCountry.getName());
+		phaseViewModel.allChanged();
+		
 		List<Country> fortifiableCountries = new ArrayList<>();
 		Queue<Country> queue = new LinkedList<>();
 		queue.add(toCountry);
@@ -62,12 +66,13 @@ public class BenevolentStrategy implements StrategyInterface{
 		if (fromCountry==null || fromCountry.getArmyCount()==1) {
 			phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() 
 					+ "\n no possible territory to fortify " + toCountry.getName());
+			phaseViewModel.allChanged();
 			return;
 		}else {
 			armiesToMove= fromCountry.getArmyCount()-1;
 			phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo()
 					+ "\n fortified"+ toCountry.getName() +"with"+ armiesToMove+ "from"+ fromCountry.getName());
-			
+			phaseViewModel.allChanged();
 			fromCountry.setArmyCount(1);
 			toCountry.setArmyCount(toCountry.getArmyCount()+armiesToMove);
 		}
@@ -84,7 +89,7 @@ public class BenevolentStrategy implements StrategyInterface{
 		// TODO Auto-generated method stub
 		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\nAttacking for Benevolent player.");
 		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\nPlayer will not attack.");
-			
+		phaseViewModel.allChanged();	
 		
 		return new Pair<Boolean, Integer>(Boolean.FALSE,null);
 	}

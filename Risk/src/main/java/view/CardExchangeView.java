@@ -2,6 +2,7 @@ package view;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,7 +22,7 @@ import model.Player;
 * @author  Yash
 * @version 1.2
 */
-public class CardExchangeView implements Observer {
+public class CardExchangeView implements Observer,Serializable {
 	
 	/** Player current player object*/
 	private Player curPlayer;

@@ -13,8 +13,14 @@ import java.util.Map;
 import controller.GameController;
 import controller.MapController;
 import javafx.util.Pair;
+import model.AggressiveStrategy;
+import model.BenevolentStrategy;
+import model.CheaterStrategy;
+import model.HumanStrategy;
 import model.Player;
+import model.RandomStrategy;
 import model.StrategyEnum;
+import model.StrategyInterface;
 
 /**
  * StartGame Class is the start of the risk game.
@@ -112,39 +118,20 @@ public class StartGame {
 		if (ifResume) {
 			startGameObj.resumeFromStartUpPhase(phaseIndex, playerIndexForStartUpPhase, currentPhase, currentPlayer,
 					input, startGameObj);
+			System.exit(0);
 		}
 
 		System.out.println("----------------Starting the Game-------------");
 		System.out.println("Load Map to play the game");
-
-		while (true) {
-			input = br.readLine();
-			String filePath = startGameObj.validateLoadMapCommands(input);
-			try {
-				if (filePath != null) {
-					String answer = startGameObj.loadMap(filePath);
-					boolean isValid = startGameObj.mapController.validateMap();
-
-					if (answer.startsWith("File") && isValid)
-						break;
-					else
-						System.out.println("Enter Valid Map file");
-				} else {
-					System.out.println("Enter Valid Load Map Command");
-				}
-			} catch (Exception e) {
-				// e.printStackTrace();
-				System.out.println("Enter Valid Load Map Command");
-			}
-		}
 
 		System.out.println(
 				"Do you want to play tournament mode or single game mode select \n 1. Tournament Mode \n 2. Single Game Mode");
 		input = br.readLine();
 		if (input.equalsIgnoreCase("1")) {
 			System.out.println("Enter Tournament related Commands ");
-			input = br.readLine();
+
 			while (true) {
+				input = br.readLine();
 				String arr[] = input.split(" ");
 				if (startGameObj.prepareTournament(arr)) {
 					break;
@@ -156,12 +143,34 @@ public class StartGame {
 			try {
 				startGameObj.gameController.setArmyCountForPlayer(playerList);
 				startGameObj.gameController.playTournament(startGameObj.fileLists, startGameObj.playerStrategyEnumMap,
-						startGameObj.numberOfGame, startGameObj.maxTurn, true);
+						startGameObj.numberOfGame, startGameObj.maxTurn, true, playerList);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
+
+			while (true) {
+				input = br.readLine();
+				String filePath = startGameObj.validateLoadMapCommands(input);
+				try {
+					if (filePath != null) {
+						String answer = startGameObj.loadMap(filePath);
+						boolean isValid = startGameObj.mapController.validateMap();
+
+						if (answer.startsWith("File") && isValid)
+							break;
+						else
+							System.out.println("Enter Valid Map file");
+					} else {
+						System.out.println("Enter Valid Load Map Command");
+					}
+				} catch (Exception e) {
+					// e.printStackTrace();
+					System.out.println("Enter Valid Load Map Command");
+				}
+			}
+
 			System.out.println("Enter Player related Commands ");
 			playerList = new ArrayList<>();
 			while (true) {
@@ -205,34 +214,53 @@ public class StartGame {
 				if (playerTurn == playerList.size()) {
 					playerTurn = 0;
 				}
-				System.out.println("Place armies for " + playerList.get(playerTurn).getPlayerName());
-				System.out.println("Total Armies are " + playerList.get(playerTurn).getArmy());
-				input = br.readLine();
-				if (input.equalsIgnoreCase("showmap")) {
-					startGameObj.gameController.loadMapOnConsole(playerList);
-					continue;
-				} else {
-					if (startGameObj.parseStartupCommand(input, playerTurn)) {
-						playerTurn++;
+				if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+					startGameObj.gameController.startUpPhase(playerList, playerTurn, false, null, 0);
+					playerTurn++;
+					if (startGameObj.ifStartupPhaseEnd()) {
+						break;
 					}
-				}
-				if (startGameObj.ifStartupPhaseEnd()) {
-					break;
+				} else {
+					if (playerList.get(playerTurn).getArmy() == 0) {
+						playerTurn++;
+						if (startGameObj.ifStartupPhaseEnd()) {
+							break;
+						}
+						continue;
+					}
+					System.out.println("Place armies for " + playerList.get(playerTurn).getPlayerName());
+					System.out.println("Total Armies are " + playerList.get(playerTurn).getArmy());
+					input = br.readLine();
+					if (input.equalsIgnoreCase("showmap")) {
+						startGameObj.gameController.loadMapOnConsole(playerList);
+						continue;
+					} else {
+						if (startGameObj.parseStartupCommand(input, playerTurn)) {
+							playerTurn++;
+						}
+					}
+					if (startGameObj.ifStartupPhaseEnd()) {
+						break;
+					}
 				}
 			}
 			System.out.println("--------------End of Startup Phase------------");
 
+			startGameObj.gameController.loadMapOnConsole(playerList);
 			playerTurn = 0;
 
 			System.out.println("Do you want to save the game(y/n)? ");
 			input = br.readLine();
 			if (input.equalsIgnoreCase("y")) {
 
-				System.out.println("Enter valid file path");
 				while (true) {
+					System.out.println("Enter valid file path");
 					input = br.readLine();
 					Player curPlayer = playerList.get(playerTurn);
-					startGameObj.gameController.saveGame(curPlayer, "Reinforcement", input, playerTurn);
+					if (startGameObj.gameController.saveGame(curPlayer, "Reinforcement", input, playerTurn)) {
+						System.exit(0);
+					}
+
 				}
 
 			}
@@ -248,34 +276,41 @@ public class StartGame {
 				 */
 				System.out.println("---------------Reinforcement Phase--------------");
 				startGameObj.gameController.reinforcementArmy(player);
-				while (true) {
-					System.out.println("Place armies for " + player.getPlayerName());
-					System.out.println("Total Armies are " + player.getArmy());
-					input = br.readLine();
-					if (input.equalsIgnoreCase("showmap")) {
-						startGameObj.gameController.loadMapOnConsole(playerList);
-						continue;
-					}
-					String[] arr = input.split(" ");
-					if (startGameObj.validateReinforcementCommand(input)) {
-						try {
-							int armyToPlace = Integer.parseInt(arr[2]);
-							if (player.getArmy() >= armyToPlace)
-								startGameObj.gameController.reinforcementPhase(player, arr[1], armyToPlace);
-							else
-								System.out.println("Cannot place armies more than what player has");
-						} catch (Exception e) {
-							System.out.println("Enter Valid Command");
-						}
 
-					} else {
-						System.out.println("Enter Valid Reinforcement Command");
-					}
-					if (startGameObj.ifStartupPhaseEnd()) {
+				while (true) {
+					if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+						startGameObj.gameController.reinforcementForNonHuman(playerList.get(playerTurn));
 						break;
+					} else {
+
+						System.out.println("Place armies for " + player.getPlayerName());
+						System.out.println("Total Armies are " + player.getArmy());
+						input = br.readLine();
+						if (input.equalsIgnoreCase("showmap")) {
+							startGameObj.gameController.loadMapOnConsole(playerList);
+							continue;
+						}
+						String[] arr = input.split(" ");
+						if (startGameObj.validateReinforcementCommand(input)) {
+							try {
+								int armyToPlace = Integer.parseInt(arr[2]);
+								if (player.getArmy() >= armyToPlace)
+									startGameObj.gameController.reinforcementPhase(player, arr[1], armyToPlace);
+								else
+									System.out.println("Cannot place armies more than what player has");
+							} catch (Exception e) {
+								e.printStackTrace();
+								System.out.println("Enter Valid Command");
+							}
+
+						} else {
+							System.out.println("Enter Valid Reinforcement Command");
+						}
+						if (startGameObj.ifStartupPhaseEnd()) {
+							break;
+						}
 					}
 				}
-
 				System.out.println("Do you want to save the game(y/n)? ");
 				input = br.readLine();
 				if (input.equalsIgnoreCase("y")) {
@@ -299,60 +334,65 @@ public class StartGame {
 				System.out.println("-------------------Attack Phase--------------");
 
 				while (true) {
-					System.out.println("Enter attack and defend command: ");
-					String attackCommand = br.readLine();
-					String defendCommand = br.readLine();
-					if (attackCommand.equalsIgnoreCase("showmap") || defendCommand.equalsIgnoreCase("showmap")) {
-						startGameObj.gameController.loadMapOnConsole(playerList);
-						continue;
-					}
-					if (startGameObj.validateAttackCommand(attackCommand)
-							&& startGameObj.validateAttackCommand(defendCommand)) {
-						String attackCommandArr[] = attackCommand.split(" ");
-						String defendCommandArr[] = defendCommand.split(" ");
-						boolean ifAllOut = false;
-						if (attackCommandArr[attackCommandArr.length - 1].equalsIgnoreCase("-noattack")) {
-							System.out.println("---Ending Attack Phase---");
-							break;
-						} else {
-							String fromCountry = attackCommandArr[1];
-							String toCountry = attackCommandArr[2];
-							Integer attackDiceNumber = Integer.parseInt(attackCommandArr[3]);
-							if (attackCommandArr.length == 5 && attackCommandArr[4].equalsIgnoreCase("-allout")) {
-								ifAllOut = true;
-							}
-							Integer defenderDiceNumber = Integer.parseInt(defendCommandArr[1]);
-							String ifCommandValid = startGameObj.gameController.validateSelectedNumberOfDice(
-									fromCountry, toCountry, attackCommandArr[3], defendCommandArr[1]);
-							if (ifCommandValid.equalsIgnoreCase("ValidChoice")) {
-								Pair<Boolean, Integer> wonMap = startGameObj.gameController.attack(player, fromCountry,
-										toCountry, ifAllOut, attackDiceNumber, defenderDiceNumber);
-
-								if (wonMap.getValue() != null) {
-									System.out.println("How many armies do you want to move?");
-									String armyMoveCommand = br.readLine();
-									startGameObj.moveArmyForAttackHelper(player, armyMoveCommand, fromCountry,
-											toCountry);
-								} else {
-									System.out.println("Player did not win the country");
-								}
+					if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+						startGameObj.gameController.attackForNonHuman(playerList.get(playerTurn),
+								startGameObj.playerStrategyEnumMap, "PlaceHolderAtatck");
+						break;
+					} else {
+						System.out.println("Enter attack and defend command: ");
+						String attackCommand = br.readLine();
+						String defendCommand = br.readLine();
+						if (attackCommand.equalsIgnoreCase("showmap") || defendCommand.equalsIgnoreCase("showmap")) {
+							startGameObj.gameController.loadMapOnConsole(playerList);
+							continue;
+						}
+						if (startGameObj.validateAttackCommand(attackCommand)
+								&& startGameObj.validateAttackCommand(defendCommand)) {
+							String attackCommandArr[] = attackCommand.split(" ");
+							String defendCommandArr[] = defendCommand.split(" ");
+							boolean ifAllOut = false;
+							if (attackCommandArr[attackCommandArr.length - 1].equalsIgnoreCase("-noattack")) {
+								System.out.println("---Ending Attack Phase---");
+								break;
 							} else {
-								System.out.println(ifCommandValid);
+								String fromCountry = attackCommandArr[1];
+								String toCountry = attackCommandArr[2];
+								Integer attackDiceNumber = Integer.parseInt(attackCommandArr[3]);
+								if (attackCommandArr.length == 5 && attackCommandArr[4].equalsIgnoreCase("-allout")) {
+									ifAllOut = true;
+								}
+								Integer defenderDiceNumber = Integer.parseInt(defendCommandArr[1]);
+								String ifCommandValid = startGameObj.gameController.validateSelectedNumberOfDice(
+										fromCountry, toCountry, attackCommandArr[3], defendCommandArr[1]);
+								if (ifCommandValid.equalsIgnoreCase("ValidChoice")) {
+									Pair<Boolean, Integer> wonMap = startGameObj.gameController.attack(player,
+											fromCountry, toCountry, ifAllOut, attackDiceNumber, defenderDiceNumber);
+
+									if (wonMap.getValue() != null) {
+										System.out.println("How many armies do you want to move?");
+										String armyMoveCommand = br.readLine();
+										startGameObj.moveArmyForAttackHelper(player, armyMoveCommand, fromCountry,
+												toCountry);
+									} else {
+										System.out.println("Player did not win the country");
+									}
+								} else {
+									System.out.println(ifCommandValid);
+								}
 							}
+
+						} else {
+							System.out.println("Enter valid attack command");
 						}
 
-					} else {
-						System.out.println("Enter valid attack command");
-					}
-
-					System.out.println("Do you want to continue the attack(y/n)");
-					input = br.readLine();
-					if (input.equalsIgnoreCase("n")) {
-						startGameObj.gameController.finishAttack(player);
-						break;
+						System.out.println("Do you want to continue the attack(y/n)");
+						input = br.readLine();
+						if (input.equalsIgnoreCase("n")) {
+							startGameObj.gameController.finishAttack(player);
+							break;
+						}
 					}
 				}
-
 				System.out.println("Do you want to save the game(y/n)? ");
 				input = br.readLine();
 				if (input.equalsIgnoreCase("y")) {
@@ -373,43 +413,48 @@ public class StartGame {
 
 				System.out.println("----------------Fortification Phase-----------------");
 				while (true) {
-					input = br.readLine();
-					if (input.equalsIgnoreCase("showmap")) {
-						startGameObj.gameController.loadMapOnConsole(playerList);
-						continue;
-					}
-					String[] arr = input.split(" ");
-					if (startGameObj.validateFortificationCommand(input)) {
-						try {
-							if (arr.length == 2 && arr[1].equalsIgnoreCase("-none")) {
-								startGameObj.gameController.fortify(player, null, null, 0);
-								System.out.println("No Fortification");
-								break;
-							}
-							int armyToFortify = Integer.parseInt(arr[3]);
-
-							List<String> result = startGameObj.gameController.validateFortification(arr[1], arr[2],
-									armyToFortify);
-							if (result.size() > 0) {
-								result.forEach(res -> System.out.println(res));
-							} else {
-								startGameObj.gameController.fortify(player, arr[1], arr[2], armyToFortify);
-								break;
-							}
-						} catch (Exception e) {
-							System.out.println("Enter Valid Command");
-						}
-					} else if (arr.length == 2) {
+					if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+						startGameObj.gameController.fortificationForNonHuman(playerList.get(playerTurn));
 						break;
 					} else {
-						System.out.println("Enter Valid command");
-					}
+						input = br.readLine();
+						if (input.equalsIgnoreCase("showmap")) {
+							startGameObj.gameController.loadMapOnConsole(playerList);
+							continue;
+						}
+						String[] arr = input.split(" ");
+						if (startGameObj.validateFortificationCommand(input)) {
+							try {
+								if (arr.length == 2 && arr[1].equalsIgnoreCase("-none")) {
+									startGameObj.gameController.fortify(player, null, null, 0);
+									System.out.println("No Fortification");
+									break;
+								}
+								int armyToFortify = Integer.parseInt(arr[3]);
 
-					System.out.println("Do you want to try with different country(y/n)");
-					input = br.readLine();
+								List<String> result = startGameObj.gameController.validateFortification(arr[1], arr[2],
+										armyToFortify);
+								if (result.size() > 0) {
+									result.forEach(res -> System.out.println(res));
+								} else {
+									startGameObj.gameController.fortify(player, arr[1], arr[2], armyToFortify);
+									break;
+								}
+							} catch (Exception e) {
+								System.out.println("Enter Valid Command");
+							}
+						} else if (arr.length == 2) {
+							break;
+						} else {
+							System.out.println("Enter Valid command");
+						}
 
-					if (input.equalsIgnoreCase("n")) {
-						break;
+						System.out.println("Do you want to try with different country(y/n)");
+						input = br.readLine();
+
+						if (input.equalsIgnoreCase("n")) {
+							break;
+						}
 					}
 				}
 
@@ -545,6 +590,8 @@ public class StartGame {
 			playerList.add(player);
 			StrategyEnum playerEnum = getEnum(args[3]);
 			playerStrategyEnumMap.put(player, playerEnum);
+			StrategyInterface si = getPlayerStrategy(playerStrategyEnumMap, player);
+			player.setPlayerStrategy(si);
 			System.out.println("Player added.");
 			break;
 		case "-remove":
@@ -877,15 +924,36 @@ public class StartGame {
 					playerList.add(p);
 					playerStrategyEnumMap.put(p, testEnum);
 				}
-				numberOfGame = Integer.parseInt(gameNumber);
-				maxTurn = Integer.parseInt(maxTurns);
+				i++;
 			}
+			numberOfGame = Integer.parseInt(gameNumber);
+			maxTurn = Integer.parseInt(maxTurns);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 
 		return true;
+	}
+
+	public StrategyInterface getPlayerStrategy(Map<Player, StrategyEnum> mapping, Player curPlayer) {
+		StrategyEnum playerEnum = mapping.get(curPlayer);
+
+		switch (playerEnum) {
+		case HUMAN:
+			return new HumanStrategy();
+		case BENEVOLENT:
+			return new BenevolentStrategy();
+		case RANDOM:
+			return new RandomStrategy();
+		case CHEATER:
+			return new CheaterStrategy();
+		case AGGRESSIVE:
+			return new AggressiveStrategy();
+		default:
+			return null;
+		}
 	}
 
 	private void resumeFromStartUpPhase(Integer phaseIndex, Integer playerIndexForStartUpPhase, String currentPhase,
@@ -895,23 +963,32 @@ public class StartGame {
 		playerTurn = playerIndexForStartUpPhase;
 
 		if (phaseIndex == 1) {
+
 			while (true) {
-				if (playerTurn == playerList.size()) {
-					playerTurn = 0;
-				}
-				System.out.println("Place armies for " + playerList.get(playerTurn).getPlayerName());
-				System.out.println("Total Armies are " + playerList.get(playerTurn).getArmy());
-				input = br.readLine();
-				if (input.equalsIgnoreCase("showmap")) {
-					startGameObj.gameController.loadMapOnConsole(playerList);
-					continue;
-				} else {
-					if (startGameObj.parseStartupCommand(input, playerTurn)) {
-						playerTurn++;
+				if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+					startGameObj.gameController.startUpPhase(playerList, playerTurn, false, null, 0);
+					playerTurn++;
+					if (startGameObj.ifStartupPhaseEnd()) {
+						break;
 					}
-				}
-				if (startGameObj.ifStartupPhaseEnd()) {
-					break;
+				} else {
+					if (playerTurn == playerList.size()) {
+						playerTurn = 0;
+					}
+					System.out.println("Place armies for " + playerList.get(playerTurn).getPlayerName());
+					System.out.println("Total Armies are " + playerList.get(playerTurn).getArmy());
+					input = br.readLine();
+					if (input.equalsIgnoreCase("showmap")) {
+						startGameObj.gameController.loadMapOnConsole(playerList);
+						continue;
+					} else {
+						if (startGameObj.parseStartupCommand(input, playerTurn)) {
+							playerTurn++;
+						}
+					}
+					if (startGameObj.ifStartupPhaseEnd()) {
+						break;
+					}
 				}
 			}
 			System.out.println("--------------End of Startup Phase------------");
@@ -930,154 +1007,10 @@ public class StartGame {
 				System.out.println("---------------Reinforcement Phase--------------");
 				startGameObj.gameController.reinforcementArmy(player);
 				while (true) {
-					System.out.println("Place armies for " + player.getPlayerName());
-					System.out.println("Total Armies are " + player.getArmy());
-					input = br.readLine();
-					if (input.equalsIgnoreCase("showmap")) {
-						startGameObj.gameController.loadMapOnConsole(playerList);
-						continue;
-					}
-					String[] arr = input.split(" ");
-					if (startGameObj.validateReinforcementCommand(input)) {
-						try {
-							int armyToPlace = Integer.parseInt(arr[2]);
-							if (player.getArmy() >= armyToPlace)
-								startGameObj.gameController.reinforcementPhase(player, arr[1], armyToPlace);
-							else
-								System.out.println("Cannot place armies more than what player has");
-						} catch (Exception e) {
-							System.out.println("Enter Valid Command");
-						}
-
-					} else {
-						System.out.println("Enter Valid Reinforcement Command");
-					}
-					if (startGameObj.ifStartupPhaseEnd()) {
-						break;
-					}
-				}
-
-				System.out.println("-------------------Attack Phase--------------");
-
-				while (true) {
-					System.out.println("Enter attack and defend command: ");
-					String attackCommand = br.readLine();
-					String defendCommand = br.readLine();
-					if (attackCommand.equalsIgnoreCase("showmap") || defendCommand.equalsIgnoreCase("showmap")) {
-						startGameObj.gameController.loadMapOnConsole(playerList);
-						continue;
-					}
-					if (startGameObj.validateAttackCommand(attackCommand)
-							&& startGameObj.validateAttackCommand(defendCommand)) {
-						String attackCommandArr[] = attackCommand.split(" ");
-						String defendCommandArr[] = defendCommand.split(" ");
-						boolean ifAllOut = false;
-						if (attackCommandArr[attackCommandArr.length - 1].equalsIgnoreCase("-noattack")) {
-							System.out.println("---Ending Attack Phase---");
-							break;
-						} else {
-							String fromCountry = attackCommandArr[1];
-							String toCountry = attackCommandArr[2];
-							Integer attackDiceNumber = Integer.parseInt(attackCommandArr[3]);
-							if (attackCommandArr.length == 5 && attackCommandArr[4].equalsIgnoreCase("-allout")) {
-								ifAllOut = true;
-							}
-							Integer defenderDiceNumber = Integer.parseInt(defendCommandArr[1]);
-							String ifCommandValid = startGameObj.gameController.validateSelectedNumberOfDice(
-									fromCountry, toCountry, attackCommandArr[3], defendCommandArr[1]);
-							if (ifCommandValid.equalsIgnoreCase("ValidChoice")) {
-								Pair<Boolean, Integer> wonMap = startGameObj.gameController.attack(player, fromCountry,
-										toCountry, ifAllOut, attackDiceNumber, defenderDiceNumber);
-
-								if (wonMap.getValue() != null) {
-									System.out.println("How many armies do you want to move?");
-									String armyMoveCommand = br.readLine();
-									startGameObj.moveArmyForAttackHelper(player, armyMoveCommand, fromCountry,
-											toCountry);
-								} else {
-									System.out.println("Player did not win the country");
-								}
-							} else {
-								System.out.println(ifCommandValid);
-							}
-						}
-
-					} else {
-						System.out.println("Enter valid attack command");
-					}
-
-					System.out.println("Do you want to continue the attack(y/n)");
-					input = br.readLine();
-					if (input.equalsIgnoreCase("n")) {
-						startGameObj.gameController.finishAttack(player);
-						break;
-					}
-				}
-
-				System.out.println("----------------Fortification Phase-----------------");
-				while (true) {
-					input = br.readLine();
-					if (input.equalsIgnoreCase("showmap")) {
-						startGameObj.gameController.loadMapOnConsole(playerList);
-						continue;
-					}
-					String[] arr = input.split(" ");
-					if (startGameObj.validateFortificationCommand(input)) {
-						try {
-							if (arr.length == 2 && arr[1].equalsIgnoreCase("-none")) {
-								startGameObj.gameController.fortify(player, null, null, 0);
-								System.out.println("No Fortification");
-								break;
-							}
-							int armyToFortify = Integer.parseInt(arr[3]);
-
-							List<String> result = startGameObj.gameController.validateFortification(arr[1], arr[2],
-									armyToFortify);
-							if (result.size() > 0) {
-								result.forEach(res -> System.out.println(res));
-							} else {
-								startGameObj.gameController.fortify(player, arr[1], arr[2], armyToFortify);
-								break;
-							}
-						} catch (Exception e) {
-							System.out.println("Enter Valid Command");
-						}
-					} else if (arr.length == 2) {
+					if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+						startGameObj.gameController.reinforcementForNonHuman(playerList.get(playerTurn));
 						break;
 					} else {
-						System.out.println("Enter Valid command");
-					}
-
-					System.out.println("Do you want to try with different country(y/n)");
-					input = br.readLine();
-
-					if (input.equalsIgnoreCase("n")) {
-						break;
-					}
-				}
-
-				System.out.println("Do you want to continue the game (y/n)");
-				input = br.readLine();
-				if (input.equalsIgnoreCase("n"))
-					break;
-				playerTurn++;
-			}
-		} else {
-			playerTurn = playerIndexForStartUpPhase;
-
-			while (true) {
-				if (playerTurn == playerList.size()) {
-					playerTurn = 0;
-				}
-				Player player = playerList.get(playerTurn);
-				startGameObj.gameController.callCardExchangeView(player);
-				/*
-				 * Reinforcement Phase
-				 */
-				if (phaseIndex <= 2) {
-					System.out.println("---------------Reinforcement Phase--------------");
-					startGameObj.gameController.reinforcementArmy(player);
-					while (true) {
 						System.out.println("Place armies for " + player.getPlayerName());
 						System.out.println("Total Armies are " + player.getArmy());
 						input = br.readLine();
@@ -1094,6 +1027,7 @@ public class StartGame {
 								else
 									System.out.println("Cannot place armies more than what player has");
 							} catch (Exception e) {
+								e.printStackTrace();
 								System.out.println("Enter Valid Command");
 							}
 
@@ -1104,12 +1038,17 @@ public class StartGame {
 							break;
 						}
 					}
-					phaseIndex = -1;
 				}
-				if (phaseIndex <= 3) {
-					System.out.println("-------------------Attack Phase--------------");
 
-					while (true) {
+				System.out.println("-------------------Attack Phase--------------");
+
+				while (true) {
+					if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+						startGameObj.gameController.attackForNonHuman(playerList.get(playerTurn),
+								startGameObj.playerStrategyEnumMap, "PlaceHolderAtatck");
+						break;
+					} else {
+
 						System.out.println("Enter attack and defend command: ");
 						String attackCommand = br.readLine();
 						String defendCommand = br.readLine();
@@ -1163,12 +1102,14 @@ public class StartGame {
 							break;
 						}
 					}
-					phaseIndex = -1;
 				}
-
-				if (phaseIndex <= 4) {
-					System.out.println("----------------Fortification Phase-----------------");
-					while (true) {
+				System.out.println("----------------Fortification Phase-----------------");
+				while (true) {
+					if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+						startGameObj.gameController.fortificationForNonHuman(playerList.get(playerTurn));
+						phaseIndex = -1;
+						break;
+					} else {
 						input = br.readLine();
 						if (input.equalsIgnoreCase("showmap")) {
 							startGameObj.gameController.loadMapOnConsole(playerList);
@@ -1208,7 +1149,186 @@ public class StartGame {
 							break;
 						}
 					}
-					phaseIndex = -1;
+				}
+
+				System.out.println("Do you want to continue the game (y/n)");
+				input = br.readLine();
+				if (input.equalsIgnoreCase("n"))
+					break;
+				playerTurn++;
+			}
+		} else {
+			playerTurn = playerIndexForStartUpPhase;
+
+			while (true) {
+				if (playerTurn == playerList.size()) {
+					playerTurn = 0;
+				}
+				Player player = playerList.get(playerTurn);
+				startGameObj.gameController.callCardExchangeView(player);
+				/*
+				 * Reinforcement Phase
+				 */
+				if (phaseIndex <= 2) {
+					System.out.println("---------------Reinforcement Phase--------------");
+					startGameObj.gameController.reinforcementArmy(player);
+					while (true) {
+						if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+							startGameObj.gameController.reinforcementForNonHuman(playerList.get(playerTurn));
+							phaseIndex = -1;
+							break;
+						} else {
+							System.out.println("Place armies for " + player.getPlayerName());
+							System.out.println("Total Armies are " + player.getArmy());
+							input = br.readLine();
+							if (input.equalsIgnoreCase("showmap")) {
+								startGameObj.gameController.loadMapOnConsole(playerList);
+								continue;
+							}
+							String[] arr = input.split(" ");
+							if (startGameObj.validateReinforcementCommand(input)) {
+								try {
+									int armyToPlace = Integer.parseInt(arr[2]);
+									if (player.getArmy() >= armyToPlace)
+										startGameObj.gameController.reinforcementPhase(player, arr[1], armyToPlace);
+									else
+										System.out.println("Cannot place armies more than what player has");
+								} catch (Exception e) {
+									System.out.println("Enter Valid Command");
+								}
+
+							} else {
+								System.out.println("Enter Valid Reinforcement Command");
+							}
+							if (startGameObj.ifStartupPhaseEnd()) {
+								phaseIndex = -1;
+								break;
+							}
+						}
+						phaseIndex = -1;
+					}
+				}
+				if (phaseIndex <= 3) {
+					System.out.println("-------------------Attack Phase--------------");
+
+					while (true) {
+						if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+							startGameObj.gameController.attackForNonHuman(playerList.get(playerTurn),
+									startGameObj.playerStrategyEnumMap, "PlaceHolderAtatck");
+							phaseIndex = -1;
+							break;
+						} else {
+
+							System.out.println("Enter attack and defend command: ");
+							String attackCommand = br.readLine();
+							String defendCommand = br.readLine();
+							if (attackCommand.equalsIgnoreCase("showmap")
+									|| defendCommand.equalsIgnoreCase("showmap")) {
+								startGameObj.gameController.loadMapOnConsole(playerList);
+								continue;
+							}
+							if (startGameObj.validateAttackCommand(attackCommand)
+									&& startGameObj.validateAttackCommand(defendCommand)) {
+								String attackCommandArr[] = attackCommand.split(" ");
+								String defendCommandArr[] = defendCommand.split(" ");
+								boolean ifAllOut = false;
+								if (attackCommandArr[attackCommandArr.length - 1].equalsIgnoreCase("-noattack")) {
+									System.out.println("---Ending Attack Phase---");
+									break;
+								} else {
+									String fromCountry = attackCommandArr[1];
+									String toCountry = attackCommandArr[2];
+									Integer attackDiceNumber = Integer.parseInt(attackCommandArr[3]);
+									if (attackCommandArr.length == 5
+											&& attackCommandArr[4].equalsIgnoreCase("-allout")) {
+										ifAllOut = true;
+									}
+									Integer defenderDiceNumber = Integer.parseInt(defendCommandArr[1]);
+									String ifCommandValid = startGameObj.gameController.validateSelectedNumberOfDice(
+											fromCountry, toCountry, attackCommandArr[3], defendCommandArr[1]);
+									if (ifCommandValid.equalsIgnoreCase("ValidChoice")) {
+										Pair<Boolean, Integer> wonMap = startGameObj.gameController.attack(player,
+												fromCountry, toCountry, ifAllOut, attackDiceNumber, defenderDiceNumber);
+
+										if (wonMap.getValue() != null) {
+											System.out.println("How many armies do you want to move?");
+											String armyMoveCommand = br.readLine();
+											startGameObj.moveArmyForAttackHelper(player, armyMoveCommand, fromCountry,
+													toCountry);
+										} else {
+											System.out.println("Player did not win the country");
+										}
+									} else {
+										System.out.println(ifCommandValid);
+									}
+								}
+
+							} else {
+								System.out.println("Enter valid attack command");
+							}
+
+							System.out.println("Do you want to continue the attack(y/n)");
+							input = br.readLine();
+							if (input.equalsIgnoreCase("n")) {
+								startGameObj.gameController.finishAttack(player);
+								phaseIndex = -1;
+								break;
+							}
+						}
+						phaseIndex = -1;
+					}
+				}
+				if (phaseIndex <= 4) {
+					System.out.println("----------------Fortification Phase-----------------");
+					while (true) {
+						if (!playerList.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+							startGameObj.gameController.fortificationForNonHuman(playerList.get(playerTurn));
+							phaseIndex = -1;
+							break;
+						} else {
+
+							input = br.readLine();
+							if (input.equalsIgnoreCase("showmap")) {
+								startGameObj.gameController.loadMapOnConsole(playerList);
+								continue;
+							}
+							String[] arr = input.split(" ");
+							if (startGameObj.validateFortificationCommand(input)) {
+								try {
+									if (arr.length == 2 && arr[1].equalsIgnoreCase("-none")) {
+										startGameObj.gameController.fortify(player, null, null, 0);
+										System.out.println("No Fortification");
+										break;
+									}
+									int armyToFortify = Integer.parseInt(arr[3]);
+
+									List<String> result = startGameObj.gameController.validateFortification(arr[1],
+											arr[2], armyToFortify);
+									if (result.size() > 0) {
+										result.forEach(res -> System.out.println(res));
+									} else {
+										startGameObj.gameController.fortify(player, arr[1], arr[2], armyToFortify);
+										break;
+									}
+								} catch (Exception e) {
+									System.out.println("Enter Valid Command");
+								}
+							} else if (arr.length == 2) {
+								break;
+							} else {
+								System.out.println("Enter Valid command");
+							}
+
+							System.out.println("Do you want to try with different country(y/n)");
+							input = br.readLine();
+
+							if (input.equalsIgnoreCase("n")) {
+								phaseIndex = -1;
+								break;
+							}
+						}
+						phaseIndex = -1;
+					}
 				}
 				System.out.println("Do you want to continue the game (y/n)");
 				input = br.readLine();

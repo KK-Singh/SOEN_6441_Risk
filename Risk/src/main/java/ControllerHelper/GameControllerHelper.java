@@ -3,7 +3,6 @@ package ControllerHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -38,12 +37,7 @@ import model.StrategyEnum;
 * @version 1.2
 */
 import model.StrategyInterface;
-/**
- * This MapService file can contains the core functions for the risk game.
- * 
- * @author Yash
- * @version 1.2
- */
+
 public class GameControllerHelper {
 
 	/**
@@ -388,7 +382,9 @@ public class GameControllerHelper {
 
 	public StrategyInterface getPlayerStrategy(Map<Player, StrategyEnum> mapping, Player curPlayer) {
 		StrategyEnum playerEnum = mapping.get(curPlayer);
-
+		if (playerEnum == null) {
+			return null;
+		}
 		switch (playerEnum) {
 		case HUMAN:
 			return new HumanStrategy();
@@ -452,7 +448,7 @@ public class GameControllerHelper {
 				ois.close();
 			}
 		} catch (Exception e) {
-			// e.print
+			// e.printStackTrace();
 		}
 
 		return go;

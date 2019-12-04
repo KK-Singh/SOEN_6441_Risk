@@ -1,4 +1,5 @@
 package model;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,7 +10,7 @@ import controller.MapController;
 /**
 @author Gurwinder Kaur 
 */
-public class CardViewModel extends Observable 
+public class CardViewModel extends Observable implements Serializable
 {
 /**
  *  curPlayer : Represents curPlayer

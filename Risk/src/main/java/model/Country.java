@@ -1,12 +1,13 @@
 package model;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * @author Gurwinder Kaur
  */
 
-public class Country {
+public class Country implements Serializable {
 /**
  * country_id : Represents continents ID
  */

@@ -1,8 +1,11 @@
 package model;
+
+import java.io.Serializable;
+
 /**
  @author Gurwinder Kaur 
  */
-public class Card 
+public class Card implements Serializable
 {
 	/**
 	 * typeOfCard : Represents type of card

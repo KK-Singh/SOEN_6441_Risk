@@ -5,12 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class ConquestMapFile {
+public class ConquestMapFile implements Serializable{
 
 	/**
 	 * This method is used to read the map file and add continents, countries and

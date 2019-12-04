@@ -1,4 +1,5 @@
 package model;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -6,7 +7,7 @@ import java.util.*;
  * @author Gurwinder Kaur
  */
 
-public class Continent {
+public class Continent implements Serializable {
 	
 	/**
 	 * Represents continents ID.

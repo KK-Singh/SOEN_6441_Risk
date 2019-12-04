@@ -2,7 +2,7 @@ package model;
 
 import javafx.util.Pair;
 
-public interface StrategyInterface {
+public interface StrategyInterface  {
 	
 	
 	public void reinforcement(Player player, Country reinforcementCountry, int noOfArmies, PhaseViewModel phaseViewModel);

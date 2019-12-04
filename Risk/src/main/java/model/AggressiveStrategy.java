@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -9,7 +10,7 @@ import java.util.Random;
 
 import javafx.util.Pair;
 
-public class AggressiveStrategy implements StrategyInterface {
+public class AggressiveStrategy implements StrategyInterface,Serializable {
 
 	@Override
 	public void reinforcement(Player player, Country reinforcementCountry, int noOfArmies,
@@ -17,11 +18,13 @@ public class AggressiveStrategy implements StrategyInterface {
 
 		phaseViewModel
 				.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + " \n Reinforcement for Aggressive Player");
+		phaseViewModel.allChanged();
 		phaseViewModel.setCurrentPlayer(player.getPlayerName());
 		reinforcementCountry = findStrongestCountryToAttackFrom(player);
 		reinforcementCountry.setArmyCount(reinforcementCountry.getArmyCount() + player.getArmy());
 		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\n moved " + noOfArmies + " to "
 				+ reinforcementCountry.getName());
+		phaseViewModel.allChanged();
 		player.setArmy(0);
 
 	}
@@ -34,6 +37,7 @@ public class AggressiveStrategy implements StrategyInterface {
 		toCountry = findStrongestCountryToAttackFrom(player);
 		phaseViewModel.setCurrentPhaseInfo(
 				phaseViewModel.getCurrentPhaseInfo() + " \n Fortifying to the strongest country" + toCountry.getName());
+		phaseViewModel.allChanged();
 		List<Country> fortifiableCountries = new ArrayList<Country>();
 
 		Queue<Country> queue = new LinkedList<Country>();
@@ -64,12 +68,14 @@ public class AggressiveStrategy implements StrategyInterface {
 
 		if (fromCountry == null || fromCountry.getArmyCount() == 1) {
 			phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\n No country to fortify from ");
+			phaseViewModel.allChanged();
 		} else {
 			armiesToMove = fromCountry.getArmyCount() - 1;
 			fromCountry.setArmyCount(1);
 			toCountry.setArmyCount(armiesToMove);
 			phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\n fortify from "
 					+ fromCountry.getName() + " to " + toCountry.getName());
+			phaseViewModel.allChanged();
 		}
 
 	}
@@ -82,7 +88,8 @@ public class AggressiveStrategy implements StrategyInterface {
 				.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\n Attacking for Aggressive Strategy");
 		phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo()
 				+ "\n Player will attack from the strongest to the weakest country");
-
+		phaseViewModel.allChanged();
+		
 		attackerCountry = findStrongestCountryToAttackFrom(attacker);
 		defenderCountry = weakestCountryToAttack(attackerCountry);
 
@@ -90,13 +97,17 @@ public class AggressiveStrategy implements StrategyInterface {
 		phaseViewModel.setCurrentPhaseInfo(
 				phaseViewModel.getCurrentPhaseInfo() + "\n Attacking Country " + attackerCountry.getName());
 
+		phaseViewModel.allChanged();
+		
 		if (defenderCountry == null) {
 			phaseViewModel
 					.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\n cannot find country to attack to");
+			phaseViewModel.allChanged();
 			return new Pair<Boolean, Integer>(Boolean.FALSE, null);
 		} else {
 			phaseViewModel.setCurrentPhaseInfo(
 					phaseViewModel.getCurrentPhaseInfo() + "\n Defending country is " + defenderCountry.getName());
+			phaseViewModel.allChanged();
 			boolean ifWon = false;
 
 			int leftTroops = -1;
@@ -124,6 +135,7 @@ public class AggressiveStrategy implements StrategyInterface {
 				defenderCountry.setCountryOwner(attacker);
 				phaseViewModel.setCurrentPhaseInfo(phaseViewModel.getCurrentPhaseInfo() + "\n moved armies from "
 						+ attackerCountry.getName() + " to " + defenderCountry.getName());
+				phaseViewModel.allChanged();
 				defenderCountry.setArmyCount(attackerCountry.getArmyCount() - 1);
 				attackerCountry.setArmyCount(1);
 				return new Pair<Boolean, Integer>(ifWon, leftTroops);
@@ -131,6 +143,7 @@ public class AggressiveStrategy implements StrategyInterface {
 			} else {
 				phaseViewModel.setCurrentPhaseInfo(
 						phaseViewModel.getCurrentPhaseInfo() + "\n" + "attacker didn't win country");
+				phaseViewModel.allChanged();
 				return new Pair<Boolean, Integer>(ifWon, null);
 			}
 		}
@@ -204,10 +217,12 @@ public class AggressiveStrategy implements StrategyInterface {
 			if (attackerDiceResult.get(i) > defenderDiceResult.get(i)) {
 				phaseViewModel.setCurrentPhaseInfo(
 						phaseViewModel.getCurrentPhaseInfo() + "\n" + "attacker won in " + i + " die roll");
+				phaseViewModel.allChanged();
 				defenderCountry.setArmyCount(defenderCountry.getArmyCount() - 1);
 			} else {
 				phaseViewModel.setCurrentPhaseInfo(
 						phaseViewModel.getCurrentPhaseInfo() + "\n" + "attacker didn't win in " + i + " die roll");
+				phaseViewModel.allChanged();
 				attackerCountry.setArmyCount(attackerCountry.getArmyCount() - 1);
 				leftTroops--;
 			}

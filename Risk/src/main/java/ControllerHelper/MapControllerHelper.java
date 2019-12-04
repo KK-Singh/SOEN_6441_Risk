@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,7 +24,7 @@ import model.ReadWriteAdapter;
  * @author Yash
  * @version 1.2
  */
-public class MapControllerHelper {
+public class MapControllerHelper implements Serializable {
 
 	public Map<Integer, Continent> continentMap = new HashMap<Integer, Continent>();
 	public Map<Integer, Country> countryMap = new HashMap<Integer, Country>();

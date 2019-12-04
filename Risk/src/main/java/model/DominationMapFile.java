@@ -5,12 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class DominationMapFile {
+public class DominationMapFile implements Serializable{
 
 	public void readFile(String filePath, Map<Integer, Continent> continentMap, Map<Integer, Country> countryMap)
 			throws IOException {

@@ -100,30 +100,34 @@ public class GameController {
 		phaseViewModel.setCurrentPhase("Startup Phase ::::");
 		phaseViewModel.setCurrentPlayer(players.get(playerTurn).getPlayerName());
 
-		if (allPlaced) {
-			phaseViewModel.setCurrentPhaseInfo(
-					"Player " + players.get(playerTurn).getPlayerName() + " will place all amries at once");
-			phaseViewModel.allChanged();
-			worldDominationModel.stateUpdate(continentMap, countryMap);
-
-			Player player = players.get(playerTurn);
-			int index = 0;
-			List<Country> playerCountries = player.getPlayerCountries();
-			int size = playerCountries.size();
-
-			while (player.getArmy() > 0) {
-				if (index == size) {
-					index = 0;
-				}
-				countryName = player.getPlayerCountries().get(index).getName();
-				gameService.fillPlayerCountry(player, countryName, 1);
-				index++;
-			}
+		if (!players.get(playerTurn).getPlayerStrategy().toString().contains("Human")) {
+			gameService.nonHumanStartupPhase(players.get(playerTurn), 1, phaseViewModel);
 		} else {
-			phaseViewModel.setCurrentPhaseInfo("Player " + players.get(playerTurn).getPlayerName() + " will place "
-					+ armyCount + " on " + countryName);
-			phaseViewModel.allChanged();
-			gameService.fillPlayerCountry(players.get(playerTurn), countryName, armyCount);
+			if (allPlaced) {
+				phaseViewModel.setCurrentPhaseInfo(
+						"Player " + players.get(playerTurn).getPlayerName() + " will place all amries at once");
+				phaseViewModel.allChanged();
+				worldDominationModel.stateUpdate(continentMap, countryMap);
+
+				Player player = players.get(playerTurn);
+				int index = 0;
+				List<Country> playerCountries = player.getPlayerCountries();
+				int size = playerCountries.size();
+
+				while (player.getArmy() > 0) {
+					if (index == size) {
+						index = 0;
+					}
+					countryName = player.getPlayerCountries().get(index).getName();
+					gameService.fillPlayerCountry(player, countryName, 1);
+					index++;
+				}
+			} else {
+				phaseViewModel.setCurrentPhaseInfo("Player " + players.get(playerTurn).getPlayerName() + " will place "
+						+ armyCount + " on " + countryName);
+				phaseViewModel.allChanged();
+				gameService.fillPlayerCountry(players.get(playerTurn), countryName, armyCount);
+			}
 		}
 	}
 
@@ -345,8 +349,9 @@ public class GameController {
 	}
 
 	public void playTournament(List<String> allFiles, Map<Player, StrategyEnum> playerStrategyMap, int numberOfGames,
-			int maxTurns, boolean ifTournament) throws IOException, InterruptedException {
+			int maxTurns, boolean ifTournament, List<Player> players) throws IOException, InterruptedException {
 
+		this.playersList = players;
 		int result = gameService.validatePlayerStrategyMappingForTournament(playerStrategyMap);
 
 		if (result == -1 || result == -2) {
@@ -373,6 +378,8 @@ public class GameController {
 
 				String filePath = allFiles.get(j);
 				mapService.readFile(filePath);
+				this.continentMap = MapControllerHelper.getObject().continentMap;
+				this.countryMap = MapControllerHelper.getObject().countryMap;
 				startGame(playersList, continentMap, countryMap);
 				startUpForNonHumanHelper();
 
@@ -381,6 +388,7 @@ public class GameController {
 						reinforcementForNonHuman(curPlayer);
 						Thread.sleep(1000);
 						if (attackForNonHuman(curPlayer, playerStrategyMap, filePath)) {
+							System.out.println(curPlayer.getPlayerStrategy() + " has won");
 							break outer;
 						}
 						Thread.sleep(1000);
@@ -396,14 +404,22 @@ public class GameController {
 						result2.add(statOfTorunament);
 						tournamentModeResult.put(filePath, result2);
 					} else {
-						result2.add(filePath);
+						result2.add(statOfTorunament);
 						tournamentModeResult.put(filePath, result2);
 					}
 				}
+
+				playersList.forEach(p -> {
+					// p.setArmy(0);
+					setArmyCountForPlayer(playersList);
+					p.setCards(new ArrayList<>());
+					p.setPlayerCountries(new ArrayList<>());
+				});
+
 			}
 		}
 		if (ifTournament) {
-			System.out.println("M : ");
+			System.out.print("M : ");
 			for (int i = 0; i < allFiles.size(); i++) {
 				if (i == allFiles.size() - 1) {
 					System.out.print(allFiles.get(i));
@@ -411,25 +427,26 @@ public class GameController {
 					System.out.print(allFiles.get(i) + ",");
 				}
 			}
-
-			System.out.println("P : ");
+			System.out.println();
+			System.out.print("P : ");
 
 			int i = playerStrategyMap.size();
 			Iterator<Player> mapIte = playerStrategyMap.keySet().iterator();
 			while (mapIte.hasNext()) {
 				Player p = mapIte.next();
-				if (i == 0) {
+				if (i == 1) {
 					System.out.print(playerStrategyMap.get(p));
 				} else {
 					System.out.print(playerStrategyMap.get(p));
-					System.out.println(",");
+					System.out.print(",");
 				}
+				i--;
 			}
-
-			System.out.println("G : ");
+			System.out.println();
+			System.out.print("G : ");
 			System.out.println(numberOfGames);
 
-			System.out.println("D : ");
+			System.out.print("D : ");
 			System.out.println(maxTurns);
 
 			printTournamentStats(numberOfGames, allFiles.size());
@@ -439,8 +456,9 @@ public class GameController {
 	private void printTournamentStats(int totalGames, int totalFiles) {
 		System.out.println();
 		StringBuilder sb = new StringBuilder();
+		sb.append("      ");
+		for (int i = 1; i <= totalGames; i++) {
 
-		for (int i = 1; i <= totalFiles; i++) {
 			sb.append("Game ");
 			sb.append(i);
 			sb.append(" ");
@@ -457,6 +475,7 @@ public class GameController {
 			sb.append("Map ");
 			sb.append(i);
 			sb.append(" ");
+			System.out.print(sb.toString());
 			values.forEach(val -> {
 				System.out.print(val + " ");
 			});
@@ -480,7 +499,7 @@ public class GameController {
 		}
 	}
 
-	private void reinforcementForNonHuman(Player curPlayer) {
+	public void reinforcementForNonHuman(Player curPlayer) {
 		reinforcementArmy(curPlayer);
 		phaseViewModel.setCurrentPhase("Reinforcement Phase for Non Human::");
 		phaseViewModel.setCurrentPlayer(curPlayer.getPlayerName());
@@ -488,7 +507,7 @@ public class GameController {
 		curPlayer.reinforcementPhase(null, 0, phaseViewModel);
 	}
 
-	private boolean attackForNonHuman(Player curPlayer, Map<Player, StrategyEnum> playerStrategyMap, String fileName) {
+	public boolean attackForNonHuman(Player curPlayer, Map<Player, StrategyEnum> playerStrategyMap, String fileName) {
 		phaseViewModel.setCurrentPhaseInfo("Attack Phase for Non Human");
 		Pair<Boolean, Integer> resultOfAttack = curPlayer.attack(null, null, null, true, 0, 0, phaseViewModel);
 		worldDominationModel.stateUpdate(continentMap, countryMap);
@@ -518,7 +537,7 @@ public class GameController {
 				result.add(statOfTorunament);
 				tournamentModeResult.put(fileName, result);
 			} else {
-				result.add(fileName);
+				result.add(statOfTorunament);
 				tournamentModeResult.put(fileName, result);
 			}
 
@@ -527,7 +546,7 @@ public class GameController {
 		return false;
 	}
 
-	private void fortificationForNonHuman(Player curPlayer) {
+	public void fortificationForNonHuman(Player curPlayer) {
 
 		phaseViewModel.setCurrentPhase("Fortification Phase for Non Human");
 		phaseViewModel.setCurrentPlayer(curPlayer.getPlayerName());
@@ -552,29 +571,36 @@ public class GameController {
 		if (obj == null) {
 			return null;
 		} else {
-			Map<Integer,Object> answerObj = new HashMap<>();
+			Map<Integer, Object> answerObj = new HashMap<>();
 			playersList = obj.getPlayerList();
 			continentMap = obj.getContinentMap();
 			countryMap = obj.getCountryMap();
-			MapControllerHelper.getObject().continentMap=continentMap;
-			MapControllerHelper.getObject().countryMap=countryMap;
+			MapControllerHelper.getObject().continentMap = continentMap;
+			MapControllerHelper.getObject().countryMap = countryMap;
 			Player currentPlayer = obj.getCurrentPlayer();
 			String currentPhase = obj.getCurrentPhase();
 			cardViewModel = obj.getCardExchangeViewModel();
 			Integer playerIndexForStartUpPhase = obj.getPlayerIndexForStartUpPhase();
-			int phaseIndex = resumeHelper(currentPlayer, currentPhase, playerIndexForStartUpPhase);
+			int phaseIndex = resumeHelper(currentPlayer, currentPhase, playerIndexForStartUpPhase, playersList);
 			answerObj.put(1, playersList);
 			answerObj.put(2, playerIndexForStartUpPhase);
 			answerObj.put(3, phaseIndex);
 			answerObj.put(4, currentPhase);
-			answerObj.put(5, currentPlayer);
+			answerObj.put(5, currentPlayer.getPlayerName());
 			return answerObj;
 		}
 	}
 
-	private int resumeHelper(Player currentPlayer, String currentPhase, Integer playerIndexForStartUpPhase) {
+	private int resumeHelper(Player currentPlayer, String currentPhase, Integer playerIndexForStartUpPhase,
+			List<Player> players) {
 
-		if (playerIndexForStartUpPhase != null) {
+		phaseViewModel = new PhaseViewModel();
+		phaseViewModel.addObserver(new PhaseView());
+
+		worldDominationModel = new WorldDominationViewModel(players);
+		worldDominationModel.addObserver(new WorldDominationView());
+
+		if (currentPhase.equalsIgnoreCase("Startup")) {
 			phaseViewModel.setCurrentPhase(currentPhase);
 			phaseViewModel.setCurrentPhaseInfo("Start Up Phase for " + currentPlayer.getPlayerName());
 			phaseViewModel.setCurrentPlayer(currentPlayer.getPlayerName());

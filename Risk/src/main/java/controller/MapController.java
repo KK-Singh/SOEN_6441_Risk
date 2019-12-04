@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Map;
 
 import ControllerHelper.MapControllerHelper;
@@ -11,7 +12,7 @@ import model.Country;
  * MapController class implements the methods of MapService object
  * @author Pegah
  */
-public class MapController {
+public class MapController implements Serializable {
 
 	MapControllerHelper serviceObj = MapControllerHelper.getObject();
 	
