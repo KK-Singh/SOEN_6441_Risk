@@ -1,12 +1,15 @@
 package model;
-
-public enum StrategyEnum {
-
-	HUMAN, BENEVOLENT, RANDOM, CHEATER, AGGRESSIVE;
-
+/**
+ * Enumeration of strategy 
+ * @author Gurwinder
+ *
+ */
+public enum StrategyEnum 
+{
+HUMAN, BENEVOLENT, RANDOM, CHEATER, AGGRESSIVE;
 	@Override
-	public String toString() {
-		
+	public String toString() 
+	{
 		switch (this) {
 		case HUMAN:
 			return "Human";
