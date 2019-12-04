@@ -122,7 +122,7 @@ public class StartGame {
 		}
 
 		System.out.println("----------------Starting the Game-------------");
-		System.out.println("Load Map to play the game");
+		
 
 		System.out.println(
 				"Do you want to play tournament mode or single game mode select \n 1. Tournament Mode \n 2. Single Game Mode");
@@ -149,7 +149,7 @@ public class StartGame {
 				e.printStackTrace();
 			}
 		} else {
-
+			System.out.println("Load Map to play the game");
 			while (true) {
 				input = br.readLine();
 				String filePath = startGameObj.validateLoadMapCommands(input);
@@ -270,7 +270,7 @@ public class StartGame {
 					playerTurn = 0;
 				}
 				Player player = playerList.get(playerTurn);
-				startGameObj.gameController.callCardExchangeView(player);
+				
 				/*
 				 * Reinforcement Phase
 				 */
@@ -282,7 +282,7 @@ public class StartGame {
 						startGameObj.gameController.reinforcementForNonHuman(playerList.get(playerTurn));
 						break;
 					} else {
-
+						startGameObj.gameController.callCardExchangeView(player);
 						System.out.println("Place armies for " + player.getPlayerName());
 						System.out.println("Total Armies are " + player.getArmy());
 						input = br.readLine();
@@ -1000,7 +1000,7 @@ public class StartGame {
 					playerTurn = 0;
 				}
 				Player player = playerList.get(playerTurn);
-				startGameObj.gameController.callCardExchangeView(player);
+				
 				/*
 				 * Reinforcement Phase
 				 */
@@ -1011,6 +1011,7 @@ public class StartGame {
 						startGameObj.gameController.reinforcementForNonHuman(playerList.get(playerTurn));
 						break;
 					} else {
+						startGameObj.gameController.callCardExchangeView(player);
 						System.out.println("Place armies for " + player.getPlayerName());
 						System.out.println("Total Armies are " + player.getArmy());
 						input = br.readLine();
@@ -1165,7 +1166,7 @@ public class StartGame {
 					playerTurn = 0;
 				}
 				Player player = playerList.get(playerTurn);
-				startGameObj.gameController.callCardExchangeView(player);
+				
 				/*
 				 * Reinforcement Phase
 				 */
@@ -1178,6 +1179,7 @@ public class StartGame {
 							phaseIndex = -1;
 							break;
 						} else {
+							startGameObj.gameController.callCardExchangeView(player);
 							System.out.println("Place armies for " + player.getPlayerName());
 							System.out.println("Total Armies are " + player.getArmy());
 							input = br.readLine();
